@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 import math
 kernel_h=1
-kernel_window=4*kernel_h
+kernel_window=8*kernel_h
+kernel_thres=0.01
 img = cv2.imread("./dataset/42049small.jpg")
 height, width, channels = img.shape
 #imgLAB = [[[0 for i in range(3)] for j in range(width)] for k in range(height)]
@@ -26,7 +27,7 @@ def neggradientkernel(x1,y1,x2,y2):
 def assignmode(x,y):
 	if check_convergance(gradp[x],gradp[y]):
 		return [x,y]
-	else
+	else:
 		[i,j]=assignmode(x+gradp[x],y+gradp[y])
 		return [i,j];
 
@@ -36,16 +37,20 @@ gradp[2][1][0]
 for i in range(height):
 	for j in range(width):
 		val=0
-		for k in range(height):
-			for l in range(width):
+		for k in range(max(0,i-kernel_window),min(height,i+kernel_window)):
+			for l in range(max(0,j-kernel_window),min(height,j+kernel_window)):
 				#print k,l
 				grad=neggradientkernel(i,j,k,l)
 				val+=grad
 				#print i,j
 				gradp[i][j][0]=k*grad
 				gradp[i][j][1]=l*grad
-		gradp[i][j][0] = gradp[i][j][0]/val - i
-		gradp[i][j][1] = gradp[i][j][1]/val - j
+		if(val<kernel_thres):
+			gradp[i][j][0] = gradp[i][j][1]=0
+		else:
+			gradp[i][j][0] = gradp[i][j][0]/val - i
+			gradp[i][j][1] = gradp[i][j][1]/val - j
+
 for i in range(height):
 	for j in range(width):
 		print '[%.2f %.2f]'%(gradp[i][j][0], gradp[i][j][1]),
