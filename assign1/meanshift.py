@@ -2,8 +2,8 @@ import sys
 import cv2
 import numpy as np
 import math
-kernel_h=20
-kernel_window=4*kernel_h
+kernel_h=15
+kernel_window=2*kernel_h
 kernel_thres=0.01
 filename = sys.argv[1]
 img = cv2.imread(filename)
@@ -18,10 +18,13 @@ mean = [[[j,i] for i in range(max(width,height))] for j in  range(max(width,heig
 gradp = [[[0,0] for i in range(max(width,height))] for j in range(max(width,height))]
 final = [[[-1,-1] for i in range(max(width,height))] for j in range(max(width,height))]
 
-def dist(x1,y1,x2,y2):
+	def distc(x1,y1,x2,y2):
+	Dc = math.sqrt((imgLAB[x1][y1][0]-imgLAB[x2][y2][0])**2 + (imgLAB[x1][y1][1]-imgLAB[x2][y2][1])**2 + (imgLAB[x1][y1][2]-imgLAB[x2][y2][2])**2)
+	return Dc
+
+def dists(x1,y1,x2,y2):
 	Ds = math.sqrt((x2-x1)**2+(y2-y2)**2)
-	Dc = math.sqrt((int(imgLAB[x1][y1][0])-int(imgLAB[x2][y2][0]))**2 + (int(imgLAB[x1][y1][1])-int(imgLAB[x2][y2][1]))**2 + (int(imgLAB[x1][y1][2])-int(imgLAB[x2][y2][2]))**2)
-	return math.sqrt(Dc**2 + (m**2)*((Ds/S)**2))
+	return m*Ds/S
 
 def check_convergance(gx,gy):
 	if abs(gx)<=1 and abs(gy)<=1:
@@ -30,9 +33,11 @@ def check_convergance(gx,gy):
 		return 0
 
 def neggradientkernel(x1,y1,x2,y2):
-	a=dist(x1,y1,x2,y2)
+	Ds=dists(x1,y1,x2,y2)
+	Dc=distc(x1,y1,x2,y2)
 	#c=distc(x1,y1,x2,y2)
-	return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*math.pi)/(kernel_h**2)
+	return math.exp(-(Ds**2)/2/(kernel_hs**2))*math.exp(-(Dc**2)/2/(kernel_hc**2))/4*math.pi
+	#return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*)/(kernel_h**2)
 
 def assignmode(x,y):
 	#print 'assignmode %d %d'%(x,y)
@@ -45,14 +50,14 @@ def assignmode(x,y):
 		return final[x][y][0],final[x][y][1]
 
 #shiftedpos = [[dist(j,i) for i in range(width)] for j in range(height) ]
-
-gradp[2][1][0]
+print "Computing gradient"
 for i in range(height):
 	for j in range(width):
 		val=0
+		# print i,j
 		for k in range(max(0,i-kernel_window),min(height,i+kernel_window)):
-			for l in range(max(0,j-kernel_window),min(height,j+kernel_window)):
-				#print k,l
+			for l in range(max(0,j-kernel_window),min(width,j+kernel_window)):
+				# print "k  %d l %d"%(k,l)
 				grad=neggradientkernel(i,j,k,l)
 				val+=grad
 				#print i,j
@@ -68,6 +73,7 @@ for i in range(height):
 	for j in range(width):
 		print '[%d %d]'%(gradp[i][j][0], gradp[i][j][1]),
 	print "\n"
+print "Computing Mode Positions"
 
 for i  in range(height):
 	for j in range(width):
@@ -79,6 +85,8 @@ for i in range(height):
 	for j in range(width):
 		print '[%d %d]'%(final[i][j][0], final[i][j][1]),
 	print "\n"
+
+print "Computing Final Image"
 
 imgLABComp=img
 for i in range(height):
