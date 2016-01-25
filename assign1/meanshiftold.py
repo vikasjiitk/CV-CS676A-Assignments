@@ -32,7 +32,7 @@ def check_convergance(gx,gy):
 def neggradientkernel(x1,y1,x2,y2):
 	a=dist(x1,y1,x2,y2)
 	#c=distc(x1,y1,x2,y2)
-	return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(8*math.pi)
+	return math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(8*math.pi)
 
 def assignmode(x,y):
 	#print 'assignmode %d %d'%(x,y)
