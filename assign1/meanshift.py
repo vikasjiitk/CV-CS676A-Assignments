@@ -18,10 +18,13 @@ mean = [[[j,i] for i in range(max(width,height))] for j in  range(max(width,heig
 gradp = [[[0,0] for i in range(max(width,height))] for j in range(max(width,height))]
 final = [[[-1,-1] for i in range(max(width,height))] for j in range(max(width,height))]
 
-def dist(x1,y1,x2,y2):
+def distc(x1,y1,x2,y2):
+	Dc = math.sqrt((imgLAB[x1][y1][0]-imgLAB[x2][y2][0])**2 + (imgLAB[x1][y1][1]-imgLAB[x2][y2][1])**2 + (imgLAB[x1][y1][2]-imgLAB[x2][y2][2])**2)
+	return Dc
+
+def dists(x1,y1,x2,y2):
 	Ds = math.sqrt((x2-x1)**2+(y2-y2)**2)
-	Dc = math.sqrt((int(imgLAB[x1][y1][0])-int(imgLAB[x2][y2][0]))**2 + (int(imgLAB[x1][y1][1])-int(imgLAB[x2][y2][1]))**2 + (int(imgLAB[x1][y1][2])-int(imgLAB[x2][y2][2]))**2)
-	return math.sqrt(Dc**2 + (m**2)*((Ds/S)**2))
+	return m*Ds/S
 
 def check_convergance(gx,gy):
 	if abs(gx)<=1 and abs(gy)<=1:
@@ -30,9 +33,10 @@ def check_convergance(gx,gy):
 		return 0
 
 def neggradientkernel(x1,y1,x2,y2):
-	a=dist(x1,y1,x2,y2)
+	Ds=dists(x1,y1,x2,y2)
+	Dc=distc(x1,y1,x2,y2)
 	#c=distc(x1,y1,x2,y2)
-	return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*math.pi)/(kernel_h**2)
+	return math.exp(-(Ds**2)/2/(kernel_hs**2))*math.exp(-(Dc**2)/2/(kernel_hc**2))/4*np.pi
 
 def assignmode(x,y):
 	#print 'assignmode %d %d'%(x,y)
