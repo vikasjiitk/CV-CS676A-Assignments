@@ -19,9 +19,15 @@ def dist(x1,y1,x2,y2):
 	Dc = math.sqrt((imgLAB[x1][y1][0]-imgLAB[x2][y2][0])**2 + (imgLAB[x1][y1][1]-imgLAB[x2][y2][1])**2 + (imgLAB[x1][y1][2]-imgLAB[x2][y2][2])**2)
 	return math.sqrt(Ds**2 + (m**2)*((Ds/S)**2))
 
+def check_convergance(gx,gy):
+	if abs(gx)<=1 and abs(gy)<=1:
+		return 1
+	else:
+		return 0
 
 def neggradientkernel(x1,y1,x2,y2):
 	a=dist(x1,y1,x2,y2)
+	#c=distc(x1,y1,x2,y2)
 	return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*math.pi)/(kernel_h**2)
 
 def assignmode(x,y):
