@@ -16,8 +16,8 @@ gradp = [[[0,0] for i in range(max(width,height))] for j in range(max(width,heig
 
 def dist(x1,y1,x2,y2):
 	Ds = math.sqrt((x2-x1)**2+(y2-y2)**2)
-	Dc = math.sqrt((imgLAB[x1][y1][0]-imgLAB[x2][y2][0])**2 + (imgLAB[x1][y1][1]-imgLAB[x2][y2][1])**2 + (imgLAB[x1][y1][2]-imgLAB[x2][y2][2])**2)
-	return math.sqrt(Ds**2 + (m**2)*((Ds/S)**2))
+	Dc = math.sqrt((int(imgLAB[x1][y1][0])-int(imgLAB[x2][y2][0]))**2 + (int(imgLAB[x1][y1][1])-int(imgLAB[x2][y2][1]))**2 + (int(imgLAB[x1][y1][2])-int(imgLAB[x2][y2][2]))**2)
+	return math.sqrt(Dc**2 + (m**2)*((Ds/S)**2))
 
 def check_convergance(gx,gy):
 	if abs(gx)<=1 and abs(gy)<=1:
@@ -31,11 +31,12 @@ def neggradientkernel(x1,y1,x2,y2):
 	return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*math.pi)/(kernel_h**2)
 
 def assignmode(x,y):
-	if check_convergance(gradp[x],gradp[y]):
+	if check_convergance(gradp[x][y][0],gradp[x][y][1]):
+		final[x,y]=[x,y]
 		return [x,y]
 	else:
-		[i,j]=assignmode(x+gradp[x],y+gradp[y])
-		return [i,j];
+		final[x,y]=assignmode(x+gradp[x][y][0],y+gradp[x][y][1])
+		return final[x,y];
 
 #shiftedpos = [[dist(j,i) for i in range(width)] for j in range(height) ]
 
@@ -59,7 +60,7 @@ for i in range(height):
 
 for i in range(height):
 	for j in range(width):
-		print '[%.2f %.2f]'%(gradp[i][j][0], gradp[i][j][1]),
+		print '[%d %d]'%(int(gradp[i][j][0]), int(gradp[i][j][1])),
 	print "\n"
 
 final = [[[-1,-1] for i in range(max(width,height))] for j in range(max(width,height))]
@@ -68,3 +69,9 @@ for i  in range(height):
 	for j in range(width):
 		if(final[i][j]==-1):
 			final[i][j]=assignmode(i,j);
+
+print "Final Positions"
+for i in range(height):
+	for j in range(width):
+		print '[%d %d]'%(int(final[i][j][0]), int(final[i][j][1])),
+	print "\n"
