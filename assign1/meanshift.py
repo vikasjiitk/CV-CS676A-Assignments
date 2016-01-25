@@ -14,7 +14,7 @@ height, width, channels = img.shape
 #imgLAB = [[[0 for i in range(3)] for j in range(width)] for k in range(height)]
 #imgLAB = cv2.cvtColor(img, cv2.CV_BGR2Lab)
 imgLAB=img
-m=1
+m=0.1
 S=1
 mean = [[[j,i] for i in range(max(width,height))] for j in  range(max(width,height))]
 gradp = [[[0,0] for i in range(max(width,height))] for j in range(max(width,height))]
@@ -25,7 +25,7 @@ def distc(x1,y1,x2,y2):
 	return Dc
 
 def dists(x1,y1,x2,y2):
-	Ds = math.sqrt((x2-x1)**2+(y2-y2)**2)
+	Ds = math.sqrt((x2-x1)**2+(y2-y1)**2)
 	return m*Ds/S
 
 def check_convergance(gx,gy):
@@ -38,7 +38,7 @@ def neggradientkernel(x1,y1,x2,y2):
 	Ds=dists(x1,y1,x2,y2)
 	Dc=distc(x1,y1,x2,y2)
 	#c=distc(x1,y1,x2,y2)
-	return math.exp(-(Ds**2)/2/(kernel_hs**2))*math.exp(-(Dc**2)/2/(kernel_hc**2))/4*math.pi
+	return 0.01*math.exp(-(Ds**2)/2/(kernel_hs**2))*math.exp(-(Dc**2)/2/(kernel_hc**2))/4*math.pi
 	#return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*)/(kernel_h**2)
 
 def assignmode(x,y):
