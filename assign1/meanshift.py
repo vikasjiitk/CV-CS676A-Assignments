@@ -2,6 +2,8 @@ import sys
 import cv2
 import numpy as np
 import math
+kernel_hs=10
+kernel_hc=20
 kernel_h=15
 kernel_window=2*kernel_h
 kernel_thres=0.01
@@ -18,8 +20,8 @@ mean = [[[j,i] for i in range(max(width,height))] for j in  range(max(width,heig
 gradp = [[[0,0] for i in range(max(width,height))] for j in range(max(width,height))]
 final = [[[-1,-1] for i in range(max(width,height))] for j in range(max(width,height))]
 
-	def distc(x1,y1,x2,y2):
-	Dc = math.sqrt((imgLAB[x1][y1][0]-imgLAB[x2][y2][0])**2 + (imgLAB[x1][y1][1]-imgLAB[x2][y2][1])**2 + (imgLAB[x1][y1][2]-imgLAB[x2][y2][2])**2)
+def distc(x1,y1,x2,y2):
+	Dc = math.sqrt((int(imgLAB[x1][y1][0])-int(imgLAB[x2][y2][0]))**2 + (int(imgLAB[x1][y1][1])-int(imgLAB[x2][y2][1]))**2 + (int(imgLAB[x1][y1][2])-int(imgLAB[x2][y2][2]))**2)
 	return Dc
 
 def dists(x1,y1,x2,y2):
