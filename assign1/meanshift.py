@@ -6,13 +6,13 @@ kernel_hs=1
 kernel_hc=1
 kernel_h=5
 kernel_window=4*kernel_h
-kernel_thres=0.01
+kernel_thres=0.1
 filename = sys.argv[1]
 img = cv2.imread(filename)
 height, width, channels = img.shape
 #print height
 #imgLAB = [[[0 for i in range(3)] for j in range(width)] for k in range(height)]
-#imgLAB = cv2.cvtColor(img, cv2.CV_BGR2Lab)
+imgLAB = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 imgLAB=img
 m=1
 S=1
@@ -40,7 +40,6 @@ def check_convergance(gx,gy):
 def neggradientkernel(x1,y1,x2,y2):
 	Ds=dists(x1,y1,x2,y2)
 	Dc=distc(x1,y1,x2,y2)
-	#c=distc(x1,y1,x2,y2)
 	return 0.01*math.exp(-(Ds**2)/2/(kernel_hs**2))*math.exp(-(Dc**2)/2/(kernel_hc**2))/4*math.pi
 	#return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*)/(kernel_h**2)
 
@@ -54,7 +53,6 @@ def assignmode(x,y):
 		final[x][y]=assignmode(x+gradp[x][y][0],y+gradp[x][y][1])
 		return final[x][y][0],final[x][y][1]
 
-#shiftedpos = [[dist(j,i) for i in range(width)] for j in range(height) ]
 print "Computing gradient"
 for i in range(height):
 	for j in range(width):
