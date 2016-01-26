@@ -2,10 +2,10 @@ import sys
 import cv2
 import numpy as np
 import math
-kernel_hs=10
-kernel_hc=10
-kernel_h=5
-kernel_window=4*kernel_h
+kernel_hs=15
+kernel_hc=15
+kernel_h=10
+kernel_window=3*kernel_h
 kernel_thres=1.1
 filename = sys.argv[1]
 img = cv2.imread(filename)
@@ -17,7 +17,7 @@ imgLAB=img
 m=1
 S=1
 lis = [[0,0] for j in  range(width*height)]
-print len(lis)
+# print len(lis)
 gradp = [[[0,0] for i in range(max(width,height))] for j in range(max(width,height))]
 final = [[[-1,-1] for i in range(max(width,height))] for j in range(max(width,height))]
 
@@ -33,8 +33,8 @@ def dist(x1,y1,x2,y2):
 	return math.sqrt(dists(x1,y1,x2,y2)**2 + distc(x1,y1,x2,y2)**2)
 
 def check_convergance(gx,gy):
-	if (abs(gx)<=2 and abs(gy)<=2):
-		print "there 2		"
+	if (math.sqrt(gx**2+gy**2)<7):
+		# print "there 2"
 		return 0
 	else:
 		return 1
@@ -59,7 +59,8 @@ def assignmode(x,y):
 	# 	lis=[]
 	while(check_convergance(gradp[tx][ty][0],gradp[tx][ty][1])):
 		lis[i]=[tx,ty]
-		print i
+		# print i
+		# print tx,ty
 		i=i+1
 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
 	for j in range(i):
@@ -83,7 +84,7 @@ for i in range(height):
 				gradp[i][j][1]+=l*grad
 		if(val<kernel_thres):
 			gradp[i][j][0] = gradp[i][j][1]=0
-			print "there"
+			# print "there"
 		else:
 			gradp[i][j][0] =int( gradp[i][j][0]/val - i)
 			gradp[i][j][1] =int( gradp[i][j][1]/val - j)
