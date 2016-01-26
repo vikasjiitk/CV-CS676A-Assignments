@@ -2,8 +2,8 @@ import sys
 import cv2
 import numpy as np
 import math
-kernel_hs=1
-kernel_hc=1
+kernel_hs=10
+kernel_hc=10
 kernel_h=5
 kernel_window=4*kernel_h
 kernel_thres=0.1
@@ -65,8 +65,8 @@ for i in range(height):
 				# print grad
 				val+=grad
 				#print i,j
-				gradp[i][j][0]=k*grad
-				gradp[i][j][1]=l*grad
+				gradp[i][j][0]+=k*grad
+				gradp[i][j][1]+=l*grad
 		if(val<kernel_thres):
 			gradp[i][j][0] = gradp[i][j][1]=0
 		else:
