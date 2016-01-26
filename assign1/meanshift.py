@@ -14,7 +14,7 @@ height, width, channels = img.shape
 #imgLAB = [[[0 for i in range(3)] for j in range(width)] for k in range(height)]
 #imgLAB = cv2.cvtColor(img, cv2.CV_BGR2Lab)
 imgLAB=img
-m=0.1
+m=1
 S=1
 mean = [[[j,i] for i in range(max(width,height))] for j in  range(max(width,height))]
 gradp = [[[0,0] for i in range(max(width,height))] for j in range(max(width,height))]
@@ -97,7 +97,8 @@ for i in range(height):
 		imgLABComp[i][j][0]=imgLAB[final[i][j][0]][final[i][j][1]][0]
 		imgLABComp[i][j][1]=imgLAB[final[i][j][0]][final[i][j][1]][1]
 		imgLABComp[i][j][2]=imgLAB[final[i][j][0]][final[i][j][1]][2]
-cv2.imshow('image',imgLABComp)
+# cv2.imshow('image',imgLABComp)
+cv2.imwrite('type1.png',imgLABComp)
 for i in range(height):
 	for j in range(width):
 		if(final[i][j][0]==i and final[i][j][1]==j):
@@ -120,6 +121,7 @@ for i in range(height):
 		imgLABComp[i][j][0]=imgLAB[final[i][j][0]][final[i][j][1]][0]
 		imgLABComp[i][j][1]=imgLAB[final[i][j][0]][final[i][j][1]][1]
 		imgLABComp[i][j][2]=imgLAB[final[i][j][0]][final[i][j][1]][2]
-cv2.imshow('image',imgLABComp)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# cv2.imshow('image',imgLABComp)
+# cv2.waitKey(0)
+cv2.imwrite('type2.png',imgLABComp)
+# cv2.destroyAllWindows()
