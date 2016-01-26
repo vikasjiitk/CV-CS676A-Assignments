@@ -44,14 +44,23 @@ def neggradientkernel(x1,y1,x2,y2):
 	#return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*)/(kernel_h**2)
 
 def assignmode(x,y):
-	#print 'assignmode %d %d'%(x,y)
-	if check_convergance(gradp[x][y][0],gradp[x][y][1]):
-		final[x][y][0]=x
-		final[x][y][1]=y
-		return [x,y]
-	else:
-		final[x][y]=assignmode(x+gradp[x][y][0],y+gradp[x][y][1])
-		return final[x][y][0],final[x][y][1]
+	lis=[]
+	lis.append([x,y])
+	tx=x
+	ty=y
+	# if check_convergance(gradp[x][y][0],gradp[x][y][1]):
+	# 	final[x][y][0]=x
+	# 	final[x][y][1]=y
+	# 	return [x,y]
+	# else:
+	# 	lis=[]
+	while(not check_convergance(gradp[tx][ty][0],gradp[tx][ty][1])):
+		lis.append([tx,ty])
+		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
+	while(len(lis)!=0):
+		[temx,temy]=lis.pop()
+		final[temx][temy]=[tx,ty]
+	return
 
 print "Computing gradient"
 for i in range(height):
@@ -82,7 +91,7 @@ print "Computing Mode Positions"
 for i  in range(height):
 	for j in range(width):
 		if(final[i][j][0]==-1):
-			final[i][j]=assignmode(i,j)
+			assignmode(i,j)
 
 # print "Final Positions"
 # for i in range(height):
