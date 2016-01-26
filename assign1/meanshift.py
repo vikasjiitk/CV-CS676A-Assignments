@@ -2,10 +2,10 @@ import sys
 import cv2
 import numpy as np
 import math
-kernel_hs=15
-kernel_hc=15
+kernel_hs=30
+kernel_hc=30
 kernel_h=10
-kernel_window=3*kernel_h
+kernel_window=2*kernel_h
 kernel_thres=1.1
 filename = sys.argv[1]
 img = cv2.imread(filename)
@@ -42,6 +42,7 @@ def check_convergance(gx,gy):
 def neggradientkernel(x1,y1,x2,y2):
 	Ds=dists(x1,y1,x2,y2)
 	Dc=distc(x1,y1,x2,y2)
+	# print Ds/kernel_hs,Dc/kernel_hc
 	return math.exp(-(Ds**2)/2/(kernel_hs**2))*math.exp(-(Dc**2)/2/(kernel_hc**2))/4*math.pi
 	#return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*)/(kernel_h**2)
 
@@ -107,6 +108,7 @@ for i  in range(height):
 # 		print '[%d %d]'%(final[i][j][0], final[i][j][1]),
 # 	print "\n"
 imgLABComp=img
+cv2.imwrite('main.png',imgLABComp)
 for i in range(height):
 	for j in range(width):
 		imgLABComp[i][j][0]=imgLAB[final[i][j][0]][final[i][j][1]][0]
