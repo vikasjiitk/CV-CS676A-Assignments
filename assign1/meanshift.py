@@ -6,7 +6,7 @@ kernel_hs=10
 kernel_hc=10
 kernel_h=5
 kernel_window=4*kernel_h
-kernel_thres=0.1
+kernel_thres=1.1
 filename = sys.argv[1]
 img = cv2.imread(filename)
 height, width, channels = img.shape
@@ -16,7 +16,8 @@ imgLAB = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 imgLAB=img
 m=1
 S=1
-mean = [[[j,i] for i in range(max(width,height))] for j in  range(max(width,height))]
+lis = [[0,0] for j in  range(width*height)]
+print len(lis)
 gradp = [[[0,0] for i in range(max(width,height))] for j in range(max(width,height))]
 final = [[[-1,-1] for i in range(max(width,height))] for j in range(max(width,height))]
 
@@ -32,20 +33,22 @@ def dist(x1,y1,x2,y2):
 	return math.sqrt(dists(x1,y1,x2,y2)**2 + distc(x1,y1,x2,y2)**2)
 
 def check_convergance(gx,gy):
-	if abs(gx)<=1 and abs(gy)<=1:
-		return 1
-	else:
+	if (abs(gx)<=2 and abs(gy)<=2):
+		print "there 2		"
 		return 0
+	else:
+		return 1
 
 def neggradientkernel(x1,y1,x2,y2):
 	Ds=dists(x1,y1,x2,y2)
 	Dc=distc(x1,y1,x2,y2)
-	return 0.01*math.exp(-(Ds**2)/2/(kernel_hs**2))*math.exp(-(Dc**2)/2/(kernel_hc**2))/4*math.pi
+	return math.exp(-(Ds**2)/2/(kernel_hs**2))*math.exp(-(Dc**2)/2/(kernel_hc**2))/4*math.pi
 	#return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*)/(kernel_h**2)
 
 def assignmode(x,y):
-	lis=[]
-	lis.append([x,y])
+	i=0
+	lis[i]=[x,y]
+	i=i+1
 	tx=x
 	ty=y
 	# if check_convergance(gradp[x][y][0],gradp[x][y][1]):
@@ -54,11 +57,13 @@ def assignmode(x,y):
 	# 	return [x,y]
 	# else:
 	# 	lis=[]
-	while(not check_convergance(gradp[tx][ty][0],gradp[tx][ty][1])):
-		lis.append([tx,ty])
+	while(check_convergance(gradp[tx][ty][0],gradp[tx][ty][1])):
+		lis[i]=[tx,ty]
+		print i
+		i=i+1
 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
-	while(len(lis)!=0):
-		[temx,temy]=lis.pop()
+	for j in range(i):
+		[temx,temy]=lis[j]
 		final[temx][temy]=[tx,ty]
 	return
 
@@ -78,10 +83,12 @@ for i in range(height):
 				gradp[i][j][1]+=l*grad
 		if(val<kernel_thres):
 			gradp[i][j][0] = gradp[i][j][1]=0
+			print "there"
 		else:
 			gradp[i][j][0] =int( gradp[i][j][0]/val - i)
 			gradp[i][j][1] =int( gradp[i][j][1]/val - j)
-
+			# if (abs(gradp[i][j][0]) <=2 and abs(gradp[i][j][1]) <=2):
+			# 	print "there"
 # for i in range(height):
 # 	for j in range(width):
 # 		print '[%d %d]'%(gradp[i][j][0], gradp[i][j][1]),
