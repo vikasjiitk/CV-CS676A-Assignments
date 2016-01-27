@@ -2,8 +2,8 @@ import sys
 import cv2
 import numpy as np
 import math
-kernel_hs=50
-kernel_hc=30
+kernel_hs=5
+kernel_hc=10
 flat_kernel_h=1
 kernel_h=10
 kernel_window=4*kernel_h
@@ -36,7 +36,7 @@ def dist(x1,y1,x2,y2):
 	return math.sqrt((m/S)**2*dists(x1,y1,x2,y2)**2 + distc(x1,y1,x2,y2)**2)
 
 def check_convergance(gx,gy):
-	if (math.sqrt(gx**2+gy**2)<2):
+	if (math.sqrt(gx**2+gy**2)<1):
 		return 0
 	else:
 		return 1
@@ -81,23 +81,21 @@ def assignmode(x,y):
 	tx=x
 	ty=y
 	while(check_convergance(gradp[tx][ty][0],gradp[tx][ty][1])):
-		if(i>height and tx in lis):
+		if(i>height and [tx,ty] in lis):
 			break
 		lis[i]=[tx,ty]
 		i=i+1
 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
-	modecount+=1
-
-	if (i<20):
+	a=set([(x[0]*x[1]) for x in lis])
+	if (len(a)<20):
 		val=10
-		val2=[i,j]
-		for k in range(max(0,i-kernel_window),min(height,i+kernel_window)):
-			for l in range(max(0,j-kernel_window),min(width,j+kernel_window)):
-				temp=dist(i,j,k,l)
-				if(temp<val and not(k==i and l==j )):
+		val2=[tx,ty]
+		for k in range(max(0,tx-kernel_window),min(height,tx+kernel_window)):
+			for l in range(max(0,ty-kernel_window),min(width,ty+kernel_window)):
+				temp=dist(tx,ty,final[k][l][0],final[k][l][1])
+				if(temp<val and final[k][l][0] != -1 and not(k==tx and l==ty )):
 					val=temp
-					val2=[k,l]
-		final[i][j]=val2
+					val2=final[k][l]
 	for j in range(i):
 		[temx,temy]=lis[j]
 		final[temx][temy]=val2
@@ -120,12 +118,9 @@ for i in range(height):
 				gradp[i][j][1]+=l*grad
 		if(val<kernel_thres):
 			gradp[i][j][0] = gradp[i][j][1]=0
-			# print "there"
 		else:
 			gradp[i][j][0] =int( gradp[i][j][0]/val - i)
 			gradp[i][j][1] =int( gradp[i][j][1]/val - j)
-			# if (abs(gradp[i][j][0]) <=2 and abs(gradp[i][j][1]) <=2):
-			# 	print "there"
 # for i in range(height):
 # 	for j in range(width):
 # 		print '[%d %d]'%(gradp[i][j][0], gradp[i][j][1]),
