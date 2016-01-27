@@ -11,6 +11,7 @@ kernel_thres=1.1
 filename = sys.argv[1]
 img = cv2.imread(filename)
 height, width, channels = img.shape
+modecount=0
 #print height
 #imgLAB = [[[0 for i in range(3)] for j in range(width)] for k in range(height)]
 imgLAB = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
@@ -35,7 +36,7 @@ def dist(x1,y1,x2,y2):
 	return math.sqrt((m/S)**2*dists(x1,y1,x2,y2)**2 + distc(x1,y1,x2,y2)**2)
 
 def check_convergance(gx,gy):
-	if (math.sqrt(gx**2+gy**2)<7):
+	if (math.sqrt(gx**2+gy**2)<2):
 		return 0
 	else:
 		return 1
@@ -72,7 +73,7 @@ def flatkernel(x1,y1,x2,y2):
 # 		# l[j].clear()
 # 	return
 
-count=0
+
 def assignmode(x,y):
 	i=0
 	lis[i]=[x,y]
@@ -85,10 +86,19 @@ def assignmode(x,y):
 		lis[i]=[tx,ty]
 		i=i+1
 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
-	count+=1
+	if (i<20):
+		val=10
+		val2=[i,j]
+		for k in range(max(0,i-kernel_window),min(height,i+kernel_window)):
+			for l in range(max(0,j-kernel_window),min(width,j+kernel_window)):
+				temp=dist(i,j,k,l)
+				if(temp<val and not(k==i and l==j )):
+					val=temp
+					val2=[k,l]
+		final[i][j]=val2
 	for j in range(i):
 		[temx,temy]=lis[j]
-		final[temx][temy]=[tx,ty]
+		final[temx][temy]=val2
 	return
 
 
@@ -124,6 +134,7 @@ for i  in range(height):
 	for j in range(width):
 		if(final[i][j][0]==-1):
 			assignmode(i,j)
+			modecount+=1
 
 # print "Final Positions"
 # for i in range(height):
@@ -155,7 +166,7 @@ for i in range(height):
 
 
 print "Computing Final Image"
-print count
+print modecount
 imgLABComp=img
 for i in range(height):
 	for j in range(width):
