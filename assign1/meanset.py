@@ -2,8 +2,8 @@ import sys
 import cv2
 import numpy as np
 import math
-kernel_hs=5
-kernel_hc=10
+kernel_hs=30
+kernel_hc=30
 flat_kernel_h=1
 kernel_h=10
 kernel_window=4*kernel_h
@@ -18,7 +18,7 @@ imgLAB = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 imgLAB=img
 m=1
 S=1
-# lis=[[] for i in range(height)]
+# li=[[] for i in range(height)]
 lis = [[0,0] for j in  range(width*height)]
 # print len(lis)
 gradp = [[[0,0] for i in range(max(width,height))] for j in range(max(width,height))]
@@ -57,20 +57,20 @@ def flatkernel(x1,y1,x2,y2):
 # def assignmodeb(x,y):
 # 	row=[]
 # 	row.append(x)
-# 	lis[x].append(y)
+# 	li[x].append(y)
 # 	tx=x
 # 	ty=y
 # 	while(check_convergance(gradp[tx][ty][0],gradp[tx][ty][1])):
-# 		if(ty in lis[tx]):
+# 		if(ty in li[tx]):
 # 			break
 # 		row.append(tx)
-# 		lis[tx].append(ty)
+# 		li[tx].append(ty)
 # 		# lis[i]=[tx,ty] print i print tx,ty i=i+1
 # 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
 # 	for j in row:
-# 		x =lis[j].pop()
+# 		x =li[j].pop()
 # 		final[j][x]=[tx,ty] # [temx,temy]=lis[j] final[temx][temy]=[tx,ty]
-# 		# l[j].clear()
+# 		# li[j].clear()
 # 	return
 
 
@@ -86,9 +86,9 @@ def assignmode(x,y):
 		lis[i]=[tx,ty]
 		i=i+1
 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
-	a=set([(x[0]*x[1]) for x in lis])
+	# a=set([(x[0]*x[1]) for x in lis])
 	val2=[tx,ty]
-	if (len(a)<20):
+	if (len(a)<50):
 		val=10
 		for k in range(max(0,tx-kernel_window),min(height,tx+kernel_window)):
 			for l in range(max(0,ty-kernel_window),min(width,ty+kernel_window)):
@@ -155,12 +155,22 @@ for i in range(height):
 			val2=[i,j]
 			for k in range(max(0,i-1),min(height,i+2)):
 				for l in range(max(0,j-1),min(width,j+2)):
-					temp=dist(i,j,k,l)
+					temp=distc(i,j,k,l)
 					if(temp<val and not(k==i and l==j )):
 						val=temp
-						val2=[k,l]
+						val2=final[k][l]
 			final[i][j]=val2
-
+# for tx in range(height):
+# 	for ty in range(width):
+# 		val2=[tx,ty]
+# 		val=10
+# 		for k in range(max(0,tx-kernel_window),min(height,tx+kernel_window)):
+# 			for l in range(max(0,ty-kernel_window),min(width,ty+kernel_window)):
+# 				temp=distc(tx,ty,final[k][l][0],final[k][l][1])
+# 				if(temp<val and final[k][l][0] != -1 and not(k==tx and l==ty )):
+# 					val=temp
+# 					val2=final[k][l]
+# 		final[tx][ty]=val2
 
 print "Computing Final Image"
 print modecount
