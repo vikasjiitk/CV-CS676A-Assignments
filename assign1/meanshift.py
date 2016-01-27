@@ -4,10 +4,11 @@ import numpy as np
 import math
 kernel_hs=30
 kernel_hc=30
-flat_kernel_h=1
-kernel_h=10
+flat_kernel_h=50
+kernel_h=20
 kernel_window=2*kernel_h
 kernel_thres=1.1
+no_of_modes=0
 filename = sys.argv[1]
 img = cv2.imread(filename)
 height, width, channels = img.shape
@@ -34,7 +35,7 @@ def dist(x1,y1,x2,y2):
 	return math.sqrt((m/S)**2*dists(x1,y1,x2,y2)**2 + distc(x1,y1,x2,y2)**2)
 
 def check_convergance(gx,gy):
-	if (math.sqrt(gx**2+gy**2)<7):
+	if (math.sqrt(gx**2+gy**2)<1):
 		# print "there 2"
 		return 0
 	else:
@@ -85,7 +86,8 @@ for i in range(height):
 		for k in range(max(0,i-kernel_window),min(height,i+kernel_window)):
 			for l in range(max(0,j-kernel_window),min(width,j+kernel_window)):
 				# print "k  %d l %d"%(k,l)
-				grad=neggradientkernel(i,j,k,l)
+				# grad=neggradientkernel(i,j,k,l)
+				grad=flatkernel(i,j,k,l)
 				# print grad
 				val+=grad
 				#print i,j
@@ -108,6 +110,7 @@ print "Computing Mode Positions"
 for i  in range(height):
 	for j in range(width):
 		if(final[i][j][0]==-1):
+			no_of_modes += 1
 			assignmode(i,j)
 
 # print "Final Positions"
@@ -139,7 +142,7 @@ for i in range(height):
 
 
 print "Computing Final Image"
-
+print no_of_modes
 imgLABComp=img
 for i in range(height):
 	for j in range(width):
