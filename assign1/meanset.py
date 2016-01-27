@@ -86,9 +86,8 @@ def assignmode(x,y):
 		lis[i]=[tx,ty]
 		i=i+1
 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
-<<<<<<< HEAD
 	modecount+=1
-=======
+
 	if (i<20):
 		val=10
 		val2=[i,j]
@@ -99,7 +98,6 @@ def assignmode(x,y):
 					val=temp
 					val2=[k,l]
 		final[i][j]=val2
->>>>>>> shubh
 	for j in range(i):
 		[temx,temy]=lis[j]
 		final[temx][temy]=val2
