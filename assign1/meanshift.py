@@ -4,6 +4,7 @@ import numpy as np
 import math
 kernel_hs=30
 kernel_hc=30
+flat_kernel_h=1
 kernel_h=10
 kernel_window=2*kernel_h
 kernel_thres=1.1
@@ -30,7 +31,7 @@ def dists(x1,y1,x2,y2):
 	return m*Ds/S
 
 def dist(x1,y1,x2,y2):
-	return math.sqrt(dists(x1,y1,x2,y2)**2 + distc(x1,y1,x2,y2)**2)
+	return math.sqrt((m/S)**2*dists(x1,y1,x2,y2)**2 + distc(x1,y1,x2,y2)**2)
 
 def check_convergance(gx,gy):
 	if (math.sqrt(gx**2+gy**2)<7):
@@ -45,6 +46,13 @@ def neggradientkernel(x1,y1,x2,y2):
 	# print Ds/kernel_hs,Dc/kernel_hc
 	return math.exp(-(Ds**2)/2/(kernel_hs**2))*math.exp(-(Dc**2)/2/(kernel_hc**2))/4*math.pi
 	#return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*)/(kernel_h**2)
+
+def flatkernel(x1,y1,x2,y2):
+	if ( dist(x1,y1,x2,y2)/flat_kernel_h <= 1):
+		return 1
+	else:
+		return 0
+	
 
 def assignmode(x,y):
 	i=0
