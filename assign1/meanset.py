@@ -87,9 +87,9 @@ def assignmode(x,y):
 		i=i+1
 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
 	a=set([(x[0]*x[1]) for x in lis])
+	val2=[tx,ty]
 	if (len(a)<20):
 		val=10
-		val2=[tx,ty]
 		for k in range(max(0,tx-kernel_window),min(height,tx+kernel_window)):
 			for l in range(max(0,ty-kernel_window),min(width,ty+kernel_window)):
 				temp=dist(tx,ty,final[k][l][0],final[k][l][1])
