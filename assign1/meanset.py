@@ -2,11 +2,11 @@ import sys
 import cv2
 import numpy as np
 import math
-kernel_hs=30
+kernel_hs=50
 kernel_hc=30
 flat_kernel_h=1
 kernel_h=10
-kernel_window=2*kernel_h
+kernel_window=4*kernel_h
 kernel_thres=1.1
 filename = sys.argv[1]
 img = cv2.imread(filename)
@@ -16,11 +16,9 @@ height, width, channels = img.shape
 imgLAB = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 imgLAB=img
 m=1
-S=50
-lis=[[] for i in range(height)]
-# for i in range(height):
-# 	l[i]=set(l[i])
-# lis = [[0,0] for j in  range(width*height)]
+S=1
+# lis=[[] for i in range(height)]
+lis = [[0,0] for j in  range(width*height)]
 # print len(lis)
 gradp = [[[0,0] for i in range(max(width,height))] for j in range(max(width,height))]
 final = [[[-1,-1] for i in range(max(width,height))] for j in range(max(width,height))]
@@ -38,7 +36,6 @@ def dist(x1,y1,x2,y2):
 
 def check_convergance(gx,gy):
 	if (math.sqrt(gx**2+gy**2)<7):
-		# print "there 2"
 		return 0
 	else:
 		return 1
@@ -48,7 +45,7 @@ def neggradientkernel(x1,y1,x2,y2):
 	Dc=distc(x1,y1,x2,y2)
 	# print Ds/kernel_hs,Dc/kernel_hc
 	return math.exp(-(Ds**2)/2/(kernel_hs**2))*math.exp(-(Dc**2)/2/(kernel_hc**2))/4*math.pi
-	#return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*)/(kernel_h**2)
+	#return math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*)/(kernel_h**2)
 
 def flatkernel(x1,y1,x2,y2):
 	if ( dist(x1,y1,x2,y2)/flat_kernel_h <= 1):
@@ -56,47 +53,44 @@ def flatkernel(x1,y1,x2,y2):
 	else:
 		return 0
 
-def assignmodeb(x,y):
-	row=[]
-	row.append(x)
-	lis[x].append(y)
+# def assignmodeb(x,y):
+# 	row=[]
+# 	row.append(x)
+# 	lis[x].append(y)
+# 	tx=x
+# 	ty=y
+# 	while(check_convergance(gradp[tx][ty][0],gradp[tx][ty][1])):
+# 		if(ty in lis[tx]):
+# 			break
+# 		row.append(tx)
+# 		lis[tx].append(ty)
+# 		# lis[i]=[tx,ty] print i print tx,ty i=i+1
+# 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
+# 	for j in row:
+# 		x =lis[j].pop()
+# 		final[j][x]=[tx,ty] # [temx,temy]=lis[j] final[temx][temy]=[tx,ty]
+# 		# l[j].clear()
+# 	return
+
+count=0
+def assignmode(x,y):
+	i=0
+	lis[i]=[x,y]
+	i=i+1
 	tx=x
 	ty=y
 	while(check_convergance(gradp[tx][ty][0],gradp[tx][ty][1])):
-		if(ty in lis[tx]):
+		if(i>height and tx in lis):
 			break
-		row.append(tx)
-		lis[tx].append(ty)
-		# lis[i]=[tx,ty] print i print tx,ty i=i+1
+		lis[i]=[tx,ty]
+		i=i+1
 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
-	for j in row:
-		x =lis[j].pop()
-		final[j][x]=[tx,ty] # [temx,temy]=lis[j] final[temx][temy]=[tx,ty]
-		# l[j].clear()
+	count+=1
+	for j in range(i):
+		[temx,temy]=lis[j]
+		final[temx][temy]=[tx,ty]
 	return
 
-# def assignmode(x,y):
-# 	i=0
-# 	lis[i]=[x,y]
-# 	i=i+1
-# 	tx=x
-# 	ty=y
-# 	# if check_convergance(gradp[x][y][0],gradp[x][y][1]):
-# 	# 	final[x][y][0]=x
-# 	# 	final[x][y][1]=y
-# 	# 	return [x,y]
-# 	# else:
-# 	# 	lis=[]
-# 	while(check_convergance(gradp[tx][ty][0],gradp[tx][ty][1])):
-# 		lis[i]=[tx,ty]
-# 		# print i
-# 		# print tx,ty
-# 		i=i+1
-# 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
-# 	for j in range(i):
-# 		[temx,temy]=lis[j]
-# 		final[temx][temy]=[tx,ty]
-# 	return
 
 print "Computing gradient"
 for i in range(height):
@@ -129,7 +123,7 @@ print "Computing Mode Positions"
 for i  in range(height):
 	for j in range(width):
 		if(final[i][j][0]==-1):
-			assignmodeb(i,j)
+			assignmode(i,j)
 
 # print "Final Positions"
 # for i in range(height):
@@ -143,8 +137,9 @@ for i in range(height):
 		imgLABComp[i][j][0]=imgLAB[final[i][j][0]][final[i][j][1]][0]
 		imgLABComp[i][j][1]=imgLAB[final[i][j][0]][final[i][j][1]][1]
 		imgLABComp[i][j][2]=imgLAB[final[i][j][0]][final[i][j][1]][2]
-# cv2.imshow('image',imgLABComp)
 cv2.imwrite('type1.png',imgLABComp)
+
+
 for i in range(height):
 	for j in range(width):
 		if(final[i][j][0]==i and final[i][j][1]==j):
@@ -160,7 +155,7 @@ for i in range(height):
 
 
 print "Computing Final Image"
-
+print count
 imgLABComp=img
 for i in range(height):
 	for j in range(width):
