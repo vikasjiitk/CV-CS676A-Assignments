@@ -2,8 +2,8 @@ import sys
 import cv2
 import numpy as np
 import math
-kernel_hs=30
-kernel_hc=30
+kernel_hs=25
+kernel_hc=25
 flat_kernel_h=1
 kernel_h=10
 kernel_window=4*kernel_h
@@ -86,12 +86,12 @@ def assignmode(x,y):
 		lis[i]=[tx,ty]
 		i=i+1
 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
-	# a=set([(x[0]*x[1]) for x in lis])
+	a=set([(x[0]*x[1]) for x in lis])
 	val2=[tx,ty]
 	if (len(a)<50):
 		val=10
-		for k in range(max(0,tx-kernel_window),min(height,tx+kernel_window)):
-			for l in range(max(0,ty-kernel_window),min(width,ty+kernel_window)):
+		for k in range(max(0,tx-kernel_window),min(height,tx)):
+			for l in range(max(0,ty-kernel_window),min(width,ty)):
 				temp=dist(tx,ty,final[k][l][0],final[k][l][1])
 				if(temp<val and final[k][l][0] != -1 and not(k==tx and l==ty )):
 					val=temp
