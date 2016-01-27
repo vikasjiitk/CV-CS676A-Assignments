@@ -2,21 +2,23 @@ import sys
 import cv2
 import numpy as np
 import math
-kernel_hs=30
-kernel_hc=30
-flat_kernel_h=1
+kernel_hs=5
+kernel_hc=10
+flat_kernel_h=50
 kernel_h=10
-kernel_window=2*kernel_h
+kernel_window=4*kernel_h
 kernel_thres=1.1
 filename = sys.argv[1]
 img = cv2.imread(filename)
 height, width, channels = img.shape
+modecount=0
 #print height
 #imgLAB = [[[0 for i in range(3)] for j in range(width)] for k in range(height)]
 imgLAB = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 imgLAB=img
 m=1
 S=50
+# lis=[[] for i in range(height)]
 lis = [[0,0] for j in  range(width*height)]
 # print len(lis)
 gradp = [[[0,0] for i in range(max(width,height))] for j in range(max(width,height))]
@@ -34,8 +36,7 @@ def dist(x1,y1,x2,y2):
 	return math.sqrt((m/S)**2*dists(x1,y1,x2,y2)**2 + distc(x1,y1,x2,y2)**2)
 
 def check_convergance(gx,gy):
-	if (math.sqrt(gx**2+gy**2)<7):
-		# print "there 2"
+	if (math.sqrt(gx**2+gy**2)<1):
 		return 0
 	else:
 		return 1
@@ -45,13 +46,32 @@ def neggradientkernel(x1,y1,x2,y2):
 	Dc=distc(x1,y1,x2,y2)
 	# print Ds/kernel_hs,Dc/kernel_hc
 	return math.exp(-(Ds**2)/2/(kernel_hs**2))*math.exp(-(Dc**2)/2/(kernel_hc**2))/4*math.pi
-	#return a*math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*)/(kernel_h**2)
+	#return math.exp(-(a**2)/2/(kernel_h**2))/math.sqrt(2*)/(kernel_h**2)
 
 def flatkernel(x1,y1,x2,y2):
 	if ( dist(x1,y1,x2,y2)/flat_kernel_h <= 1):
 		return 1
 	else:
 		return 0
+
+# def assignmodeb(x,y):
+# 	row=[]
+# 	row.append(x)
+# 	lis[x].append(y)
+# 	tx=x
+# 	ty=y
+# 	while(check_convergance(gradp[tx][ty][0],gradp[tx][ty][1])):
+# 		if(ty in lis[tx]):
+# 			break
+# 		row.append(tx)
+# 		lis[tx].append(ty)
+# 		# lis[i]=[tx,ty] print i print tx,ty i=i+1
+# 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
+# 	for j in row:
+# 		x =lis[j].pop()
+# 		final[j][x]=[tx,ty] # [temx,temy]=lis[j] final[temx][temy]=[tx,ty]
+# 		# l[j].clear()
+# 	return
 
 
 def assignmode(x,y):
@@ -60,22 +80,27 @@ def assignmode(x,y):
 	i=i+1
 	tx=x
 	ty=y
-	# if check_convergance(gradp[x][y][0],gradp[x][y][1]):
-	# 	final[x][y][0]=x
-	# 	final[x][y][1]=y
-	# 	return [x,y]
-	# else:
-	# 	lis=[]
 	while(check_convergance(gradp[tx][ty][0],gradp[tx][ty][1])):
+		if(i>height and [tx,ty] in lis):
+			break
 		lis[i]=[tx,ty]
-		# print i
-		# print tx,ty
 		i=i+1
 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
+	a=set([(x[0]*x[1]) for x in lis])
+	val2=[tx,ty]
+	if (len(a)<20):
+		val=10
+		for k in range(max(0,tx-kernel_window),min(height,tx+kernel_window)):
+			for l in range(max(0,ty-kernel_window),min(width,ty+kernel_window)):
+				temp=dist(tx,ty,final[k][l][0],final[k][l][1])
+				if(temp<val and final[k][l][0] != -1 and not(k==tx and l==ty )):
+					val=temp
+					val2=final[k][l]
 	for j in range(i):
 		[temx,temy]=lis[j]
-		final[temx][temy]=[tx,ty]
+		final[temx][temy]=val2
 	return
+
 
 print "Computing gradient"
 for i in range(height):
@@ -85,7 +110,8 @@ for i in range(height):
 		for k in range(max(0,i-kernel_window),min(height,i+kernel_window)):
 			for l in range(max(0,j-kernel_window),min(width,j+kernel_window)):
 				# print "k  %d l %d"%(k,l)
-				grad=neggradientkernel(i,j,k,l)
+				# grad=neggradientkernel(i,j,k,l)
+				grad=flatkernel(i,j,k,l)
 				# print grad
 				val+=grad
 				#print i,j
@@ -93,12 +119,9 @@ for i in range(height):
 				gradp[i][j][1]+=l*grad
 		if(val<kernel_thres):
 			gradp[i][j][0] = gradp[i][j][1]=0
-			# print "there"
 		else:
 			gradp[i][j][0] =int( gradp[i][j][0]/val - i)
 			gradp[i][j][1] =int( gradp[i][j][1]/val - j)
-			# if (abs(gradp[i][j][0]) <=2 and abs(gradp[i][j][1]) <=2):
-			# 	print "there"
 # for i in range(height):
 # 	for j in range(width):
 # 		print '[%d %d]'%(gradp[i][j][0], gradp[i][j][1]),
@@ -109,6 +132,7 @@ for i  in range(height):
 	for j in range(width):
 		if(final[i][j][0]==-1):
 			assignmode(i,j)
+			modecount+=1
 
 # print "Final Positions"
 # for i in range(height):
@@ -122,8 +146,9 @@ for i in range(height):
 		imgLABComp[i][j][0]=imgLAB[final[i][j][0]][final[i][j][1]][0]
 		imgLABComp[i][j][1]=imgLAB[final[i][j][0]][final[i][j][1]][1]
 		imgLABComp[i][j][2]=imgLAB[final[i][j][0]][final[i][j][1]][2]
-# cv2.imshow('image',imgLABComp)
 cv2.imwrite('type1.png',imgLABComp)
+
+
 for i in range(height):
 	for j in range(width):
 		if(final[i][j][0]==i and final[i][j][1]==j):
@@ -139,7 +164,7 @@ for i in range(height):
 
 
 print "Computing Final Image"
-
+print modecount
 imgLABComp=img
 for i in range(height):
 	for j in range(width):
