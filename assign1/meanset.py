@@ -11,6 +11,7 @@ kernel_thres=1.1
 filename = sys.argv[1]
 img = cv2.imread(filename)
 height, width, channels = img.shape
+modecount=0
 #print height
 #imgLAB = [[[0 for i in range(3)] for j in range(width)] for k in range(height)]
 imgLAB = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
@@ -72,7 +73,7 @@ def flatkernel(x1,y1,x2,y2):
 # 		# l[j].clear()
 # 	return
 
-count=0
+
 def assignmode(x,y):
 	i=0
 	lis[i]=[x,y]
@@ -85,7 +86,7 @@ def assignmode(x,y):
 		lis[i]=[tx,ty]
 		i=i+1
 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
-	count+=1
+	modecount+=1
 	for j in range(i):
 		[temx,temy]=lis[j]
 		final[temx][temy]=[tx,ty]
@@ -155,7 +156,7 @@ for i in range(height):
 
 
 print "Computing Final Image"
-print count
+print modecount
 imgLABComp=img
 for i in range(height):
 	for j in range(width):
