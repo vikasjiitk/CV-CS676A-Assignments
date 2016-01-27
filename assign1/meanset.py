@@ -17,7 +17,10 @@ imgLAB = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 imgLAB=img
 m=1
 S=50
-lis = [[0,0] for j in  range(width*height)]
+lis=[[] for i in range(height)]
+# for i in range(height):
+# 	l[i]=set(l[i])
+# lis = [[0,0] for j in  range(width*height)]
 # print len(lis)
 gradp = [[[0,0] for i in range(max(width,height))] for j in range(max(width,height))]
 final = [[[-1,-1] for i in range(max(width,height))] for j in range(max(width,height))]
@@ -53,29 +56,47 @@ def flatkernel(x1,y1,x2,y2):
 	else:
 		return 0
 
-
-def assignmode(x,y):
-	i=0
-	lis[i]=[x,y]
-	i=i+1
+def assignmodeb(x,y):
+	row=[]
+	row.append(x)
+	lis[x].append(y)
 	tx=x
 	ty=y
-	# if check_convergance(gradp[x][y][0],gradp[x][y][1]):
-	# 	final[x][y][0]=x
-	# 	final[x][y][1]=y
-	# 	return [x,y]
-	# else:
-	# 	lis=[]
 	while(check_convergance(gradp[tx][ty][0],gradp[tx][ty][1])):
-		lis[i]=[tx,ty]
-		# print i
-		# print tx,ty
-		i=i+1
+		if(ty in lis[tx]):
+			break
+		row.append(tx)
+		lis[tx].append(ty)
+		# lis[i]=[tx,ty] print i print tx,ty i=i+1
 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
-	for j in range(i):
-		[temx,temy]=lis[j]
-		final[temx][temy]=[tx,ty]
+	for j in row:
+		x =lis[j].pop()
+		final[j][x]=[tx,ty] # [temx,temy]=lis[j] final[temx][temy]=[tx,ty]
+		# l[j].clear()
 	return
+
+# def assignmode(x,y):
+# 	i=0
+# 	lis[i]=[x,y]
+# 	i=i+1
+# 	tx=x
+# 	ty=y
+# 	# if check_convergance(gradp[x][y][0],gradp[x][y][1]):
+# 	# 	final[x][y][0]=x
+# 	# 	final[x][y][1]=y
+# 	# 	return [x,y]
+# 	# else:
+# 	# 	lis=[]
+# 	while(check_convergance(gradp[tx][ty][0],gradp[tx][ty][1])):
+# 		lis[i]=[tx,ty]
+# 		# print i
+# 		# print tx,ty
+# 		i=i+1
+# 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
+# 	for j in range(i):
+# 		[temx,temy]=lis[j]
+# 		final[temx][temy]=[tx,ty]
+# 	return
 
 print "Computing gradient"
 for i in range(height):
@@ -108,7 +129,7 @@ print "Computing Mode Positions"
 for i  in range(height):
 	for j in range(width):
 		if(final[i][j][0]==-1):
-			assignmode(i,j)
+			assignmodeb(i,j)
 
 # print "Final Positions"
 # for i in range(height):
