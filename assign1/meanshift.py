@@ -95,7 +95,7 @@ def mergemode(tx,ty):
 		temp=modes_count[tx][ty][1].pop()
 		final[temp[0]][temp[1]]=val2
 		modes_count[val2[0]][val2[1]][1].append(temp)
-	modes.remove(tx,ty)
+	modes.remove([tx,ty])
 	return
 
 def assignmode(x,y):
