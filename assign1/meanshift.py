@@ -199,7 +199,6 @@ for i  in range(height):
 # 		print '[%d %d]'%(final[i][j][0], final[i][j][1]),
 # 	print "\n"
 
-
 # for i in range(height):
 # 	for j in range(width):
 # 		if(final[i][j][0]==i and final[i][j][1]==j):
