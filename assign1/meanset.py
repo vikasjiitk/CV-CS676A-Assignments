@@ -9,6 +9,9 @@ kernel_h=10
 kernel_window=4*kernel_h
 kernel_thres=1.1
 filename = sys.argv[1]
+kernel_hs=int(sys.argv[2])
+kernel_hc=int(sys.argv[3])
+print kernel_hs, kernel_hc
 img = cv2.imread(filename)
 height, width, channels = img.shape
 modecount=0
@@ -139,13 +142,13 @@ for i  in range(height):
 # 		print '[%d %d]'%(final[i][j][0], final[i][j][1]),
 # 	print "\n"
 imgLABComp=img
-cv2.imwrite('main.png',imgLABComp)
+cv2.imwrite('main'+str(kernel_hs)+str(kernel_hc)+'.png',imgLABComp)
 for i in range(height):
 	for j in range(width):
 		imgLABComp[i][j][0]=imgLAB[final[i][j][0]][final[i][j][1]][0]
 		imgLABComp[i][j][1]=imgLAB[final[i][j][0]][final[i][j][1]][1]
 		imgLABComp[i][j][2]=imgLAB[final[i][j][0]][final[i][j][1]][2]
-cv2.imwrite('type1.png',imgLABComp)
+cv2.imwrite('type1'+str(kernel_hs)+str(kernel_hc)+'.png',imgLABComp)
 
 
 for i in range(height):
@@ -182,5 +185,5 @@ for i in range(height):
 		imgLABComp[i][j][2]=imgLAB[final[i][j][0]][final[i][j][1]][2]
 # cv2.imshow('image',imgLABComp)
 # cv2.waitKey(0)
-cv2.imwrite('type2.png',imgLABComp)
+cv2.imwrite('type2'+str(kernel_hs)+str(kernel_hc)+'.png',imgLABComp)
 # cv2.destroyAllWindows()
