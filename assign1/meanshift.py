@@ -170,6 +170,15 @@ for i  in range(height):
 		modes_count[final[i][j][0]][final[i][j][1]][1].append([i,j])
 
 print 'Initial number of modes: ' + str(len(modes))
+imgLABComp=img
+# cv2.imwrite('main.png',imgLABComp)
+for i in range(height):
+	for j in range(width):
+		imgLABComp[i][j][0]=imgLAB[final[i][j][0]][final[i][j][1]][0]
+		imgLABComp[i][j][1]=imgLAB[final[i][j][0]][final[i][j][1]][1]
+		imgLABComp[i][j][2]=imgLAB[final[i][j][0]][final[i][j][1]][2]
+cv2.imwrite(filename[:-4]+'type1'+str(kernel_hs)+str(kernel_hc)+'.png',imgLABComp)
+
 for i  in range(height):
 	for j in range(width):
 		if(modes_count[i][j][0]<20 and modes_count[i][j][0] !=0):
@@ -189,14 +198,6 @@ for i  in range(height):
 # 	for j in range(width):
 # 		print '[%d %d]'%(final[i][j][0], final[i][j][1]),
 # 	print "\n"
-imgLABComp=img
-cv2.imwrite('main.png',imgLABComp)
-for i in range(height):
-	for j in range(width):
-		imgLABComp[i][j][0]=imgLAB[final[i][j][0]][final[i][j][1]][0]
-		imgLABComp[i][j][1]=imgLAB[final[i][j][0]][final[i][j][1]][1]
-		imgLABComp[i][j][2]=imgLAB[final[i][j][0]][final[i][j][1]][2]
-cv2.imwrite(filename[:-4]+'type1'+str(kernel_hs)+str(kernel_hc)+'.png',imgLABComp)
 
 
 # for i in range(height):
@@ -224,7 +225,7 @@ cv2.imwrite(filename[:-4]+'type1'+str(kernel_hs)+str(kernel_hc)+'.png',imgLABCom
 # 		final[tx][ty]=val2
 
 print "Computing Final Image"
-print 'Initial number of modes: ' + str(len(modes))
+print 'Final number of modes: ' + str(len(modes))
 imgLABComp=img
 for i in range(height):
 	for j in range(width):
@@ -233,5 +234,5 @@ for i in range(height):
 		imgLABComp[i][j][2]=imgLAB[final[i][j][0]][final[i][j][1]][2]
 # cv2.imshow('image',imgLABComp)
 # cv2.waitKey(0)
-cv2.imwrite(filename[:-4]+'type2'+str(kernel_hs)+str(kernel_hc)+'.png',imgLABComp)
+# cv2.imwrite(filename[:-4]+'type2'+str(kernel_hs)+str(kernel_hc)+'.png',imgLABComp)
 # cv2.destroyAllWindows()
