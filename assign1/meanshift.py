@@ -9,6 +9,9 @@ kernel_h=10
 kernel_window=4*kernel_h
 kernel_thres=1.1
 filename = sys.argv[1]
+# kernel_hs=int(sys.argv[2])
+# kernel_hc=int(sys.argv[3])
+# print kernel_hs, kernel_hc
 img = cv2.imread(filename)
 height, width, channels = img.shape
 # modecount=0
@@ -166,7 +169,7 @@ for i  in range(height):
 			modes_count[final[i][j][0]][final[i][j][1]][0] += 1
 		modes_count[final[i][j][0]][final[i][j][1]][1].append([i,j])
 
-print len(modes)
+print 'Initial number of modes: ' + str(len(modes))
 for i  in range(height):
 	for j in range(width):
 		if(modes_count[i][j][0]<20 and modes_count[i][j][0] !=0):
@@ -221,7 +224,7 @@ cv2.imwrite('flat/type1'+filename+'.png',imgLABComp)
 # 		final[tx][ty]=val2
 
 print "Computing Final Image"
-print len(modes)
+print 'Initial number of modes: ' + str(len(modes))
 imgLABComp=img
 for i in range(height):
 	for j in range(width):
