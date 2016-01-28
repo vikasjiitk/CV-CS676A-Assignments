@@ -103,3 +103,30 @@ Computing gradient
 Computing Mode Positions
 Computing Final Image
 15942
+20 45
+Computing gradient
+Computing Mode Positions
+Computing Final Image
+15848
+20 50
+Computing gradient
+Computing Mode Positions
+Computing Final Image
+15824
+25 10
+Computing gradient
+Computing Mode Positions
+Computing Final Image
+16243
+25 15
+Computing gradient
+Computing Mode Positions
+Computing Final Image
+16413
+25 20
+Computing gradient
+Computing Mode Positions
+Computing Final Image
+16488
+25 30
+Computing gradient
