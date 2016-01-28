@@ -91,14 +91,14 @@ def assignmode(x,y):
 		[tx,ty]=[tx+gradp[tx][ty][0],ty+gradp[tx][ty][1]]
 	a=set([(x[0]*x[1]) for x in lis])
 	val2=[tx,ty]
-	if (len(a)<50):
-		val=10
-		for k in range(max(0,tx-kernel_window),min(height,tx)):
-			for l in range(max(0,ty-kernel_window),min(width,ty)):
-				temp=dist(tx,ty,final[k][l][0],final[k][l][1])
-				if(temp<val and final[k][l][0] != -1 and not(k==tx and l==ty )):
-					val=temp
-					val2=final[k][l]
+	# if (len(a)<50):
+	# 	val=10
+	# 	for k in range(max(0,tx-kernel_window),min(height,tx)):
+	# 		for l in range(max(0,ty-kernel_window),min(width,ty)):
+	# 			temp=dist(tx,ty,final[k][l][0],final[k][l][1])
+	# 			if(temp<val and final[k][l][0] != -1 and not(k==tx and l==ty )):
+	# 				val=temp
+	# 				val2=final[k][l]
 	for j in range(i):
 		[temx,temy]=lis[j]
 		final[temx][temy]=val2

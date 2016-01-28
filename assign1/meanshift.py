@@ -11,7 +11,7 @@ kernel_thres=1.1
 filename = sys.argv[1]
 img = cv2.imread(filename)
 height, width, channels = img.shape
-modecount=0
+# modecount=0
 #print height
 #imgLAB = [[[0 for i in range(3)] for j in range(width)] for k in range(height)]
 imgLAB = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
@@ -20,11 +20,11 @@ m=1
 S=20
 # li=[[] for i in range(height)]
 lis = [[0,0] for j in  range(width*height)]
-modes = [[0,0] for j in  range(width*height)]
+modes = []#[0,0] for j in  range(width*height)]
 # print len(lis)
 gradp = [[[0,0] for i in range(max(width,height))] for j in range(max(width,height))]
 final = [[[-1,-1] for i in range(max(width,height))] for j in range(max(width,height))]
-modes_count = [[[0] for i in range(max(width,height))] for j in range(max(width,height))]
+modes_count = [[[0,[]] for i in range(max(width,height))] for j in range(max(width,height))]
 
 def distc(x1,y1,x2,y2):
 	Dc = math.sqrt((int(imgLAB[x1][y1][0])-int(imgLAB[x2][y2][0]))**2 + (int(imgLAB[x1][y1][1])-int(imgLAB[x2][y2][1]))**2 + (int(imgLAB[x1][y1][2])-int(imgLAB[x2][y2][2]))**2)
@@ -75,6 +75,25 @@ def flatkernel(x1,y1,x2,y2):
 # 		# li[j].clear()
 # 	return
 
+def mergemode(tx,ty):
+	val=10
+	val2=[tx,ty]
+	for k in range(max(0,tx-kernel_window),min(height,tx+kernel_window)):
+		for l in range(max(0,ty-kernel_window),min(width,ty+kernel_window)):
+			temp=dist(tx,ty,final[k][l][0],final[k][l][1])
+			if(temp<val and not(final[k][l][0]==tx and final[k][l][1]==ty )):
+				val=temp
+				val2=final[k][l]
+	if(val2 == [tx,ty]):
+		return
+	modes_count[val2[0]][val2[1]][0]+=modes_count[tx][ty][0]
+	modes_count[tx][ty][0]=0
+	while len(modes_count[tx][ty][1]):
+		temp=modes_count[tx][ty][1].pop()
+		final[temp[0]][temp[1]]=val2
+		modes_count[val2[0]][val2[1]][1].append(temp)
+	modes.remove(tx,ty)
+	return
 
 def assignmode(x,y):
 	i=0
@@ -138,17 +157,20 @@ for i  in range(height):
 		if(final[i][j][0]==-1):
 			assignmode(i,j)
 
-it=0
 for i  in range(height):
 	for j in range(width):
 		if (not (final[i][j] in modes)):
-			modes[it] = final[i][j]
-			modes_count[final[i][j][0]][final[i][j][1]] = 1 
-			it +=1
-			modecount += 1
+			modes.append(final[i][j])
+			modes_count[final[i][j][0]][final[i][j][1]][0] = 1
 		else:
-			modes_count[final[i][j][0]][final[i][j][1]] += 1
+			modes_count[final[i][j][0]][final[i][j][1]][0] += 1
+		modes_count[final[i][j][0]][final[i][j][1]][1].append([i,j])
 
+print len(modes)
+for i  in range(height):
+	for j in range(width):
+		if(modes_count[i][j][0]<20 and modes_count[i][j][0] !=0):
+			mergemode(i,j)
 #for [p,q] in modes:
 #	if (modes_count[p][q] <=40):
 #		val=100
@@ -158,7 +180,7 @@ for i  in range(height):
 #				if(temp<val and final[k][l][0] != -1 and not(final[k][l][0]==p and final[k][l][1]==q )):
 #					val=temp
 #					val2=final[k][l]
-		 
+
 # print "Final Positions"
 # for i in range(height):
 # 	for j in range(width):
@@ -174,18 +196,18 @@ for i in range(height):
 cv2.imwrite('flat/type1'+filename+'.png',imgLABComp)
 
 
-for i in range(height):
-	for j in range(width):
-		if(final[i][j][0]==i and final[i][j][1]==j):
-			val=10
-			val2=[i,j]
-			for k in range(max(0,i-1),min(height,i+2)):
-				for l in range(max(0,j-1),min(width,j+2)):
-					temp=distc(i,j,k,l)
-					if(temp<val and not(k==i and l==j )):
-						val=temp
-						val2=final[k][l]
-			final[i][j]=val2
+# for i in range(height):
+# 	for j in range(width):
+# 		if(final[i][j][0]==i and final[i][j][1]==j):
+# 			val=10
+# 			val2=[i,j]
+# 			for k in range(max(0,i-1),min(height,i+2)):
+# 				for l in range(max(0,j-1),min(width,j+2)):
+# 					temp=distc(i,j,k,l)
+# 					if(temp<val and not(k==i and l==j )):
+# 						val=temp
+# 						val2=final[k][l]
+# 			final[i][j]=val2
 # for tx in range(height):
 # 	for ty in range(width):
 # 		val2=[tx,ty]
@@ -199,7 +221,7 @@ for i in range(height):
 # 		final[tx][ty]=val2
 
 print "Computing Final Image"
-print modecount
+print len(modes)
 imgLABComp=img
 for i in range(height):
 	for j in range(width):
