@@ -196,7 +196,7 @@ for i in range(height):
 		imgLABComp[i][j][0]=imgLAB[final[i][j][0]][final[i][j][1]][0]
 		imgLABComp[i][j][1]=imgLAB[final[i][j][0]][final[i][j][1]][1]
 		imgLABComp[i][j][2]=imgLAB[final[i][j][0]][final[i][j][1]][2]
-cv2.imwrite('flat/type1'+filename+'.png',imgLABComp)
+cv2.imwrite(filename[:-4]+'type1'+str(kernel_hs)+str(kernel_hc)+'.png',imgLABComp)
 
 
 # for i in range(height):
@@ -233,5 +233,5 @@ for i in range(height):
 		imgLABComp[i][j][2]=imgLAB[final[i][j][0]][final[i][j][1]][2]
 # cv2.imshow('image',imgLABComp)
 # cv2.waitKey(0)
-cv2.imwrite('flat/type2'+filename+'.png',imgLABComp)
+cv2.imwrite(filename[:-4]+'type2'+str(kernel_hs)+str(kernel_hc)+'.png',imgLABComp)
 # cv2.destroyAllWindows()
