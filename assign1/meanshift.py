@@ -9,9 +9,9 @@ kernel_h=10
 kernel_window=4*kernel_h
 kernel_thres=1.1
 filename = sys.argv[1]
-# kernel_hs=int(sys.argv[2])
-# kernel_hc=int(sys.argv[3])
-# print kernel_hs, kernel_hc
+kernel_hs=int(sys.argv[2])
+kernel_hc=int(sys.argv[3])
+print kernel_hs, kernel_hc
 img = cv2.imread(filename)
 height, width, channels = img.shape
 # modecount=0
