@@ -8,9 +8,11 @@ flat_kernel_h=35
 kernel_h=10
 kernel_window=4*kernel_h
 kernel_thres=1.1
+conv=30
 filename = sys.argv[1]
 kernel_hs=int(sys.argv[2])
 kernel_hc=int(sys.argv[3])
+conv=int(sys.argv[4])
 print kernel_hs, kernel_hc
 img = cv2.imread(filename)
 height, width, channels = img.shape
@@ -137,8 +139,8 @@ for i in range(height):
 		for k in range(max(0,i-kernel_window),min(height,i+kernel_window)):
 			for l in range(max(0,j-kernel_window),min(width,j+kernel_window)):
 				# print "k  %d l %d"%(k,l)
-				grad=neggradientkernel(i,j,k,l)
-				# grad=flatkernel(i,j,k,l)
+				# grad=neggradientkernel(i,j,k,l)
+				grad=flatkernel(i,j,k,l)
 				# print grad
 				val+=grad
 				#print i,j
@@ -181,7 +183,7 @@ cv2.imwrite(filename[:-4]+'type1'+str(kernel_hs)+str(kernel_hc)+'.png',imgLABCom
 
 for i  in range(height):
 	for j in range(width):
-		if(modes_count[i][j][0]<20 and modes_count[i][j][0] !=0):
+		if(modes_count[i][j][0]<conv and modes_count[i][j][0] !=0):
 			mergemode(i,j)
 #for [p,q] in modes:
 #	if (modes_count[p][q] <=40):
