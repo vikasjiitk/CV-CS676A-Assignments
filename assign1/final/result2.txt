@@ -1,0 +1,66 @@
+10 10
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 2185
+Computing Final Image
+Final number of modes: 842
+10 15
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 3018
+Computing Final Image
+Final number of modes: 877
+15 30
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 3933
+Computing Final Image
+Final number of modes: 991
+15 35
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 4401
+Computing Final Image
+Final number of modes: 1059
+20 25
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 3634
+Computing Final Image
+Final number of modes: 926
+20 30
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 3929
+Computing Final Image
+Final number of modes: 994
+20 35
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 4396
+Computing Final Image
+Final number of modes: 1057
+35 15
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 3005
+Computing Final Image
+Final number of modes: 862
+35 20
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 3371
+Computing Final Image
+Final number of modes: 918
+35 25
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 3613
+Computing Final Image
+Final number of modes: 923
+35 30
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 3918
+Computing Final Image
+Final number of modes: 992
