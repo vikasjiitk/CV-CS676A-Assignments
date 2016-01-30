@@ -64,3 +64,15 @@ Computing Mode Positions
 Initial number of modes: 3918
 Computing Final Image
 Final number of modes: 992
+45 20
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 3370
+Computing Final Image
+Final number of modes: 919
+45 25
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 3610
+Computing Final Image
+Final number of modes: 921
