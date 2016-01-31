@@ -76,3 +76,51 @@ Computing Mode Positions
 Initial number of modes: 3350
 Computing Final Image
 Final number of modes: 872
+20 35
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 3350
+Computing Final Image
+Final number of modes: 761
+35 15
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 2143
+Computing Final Image
+Final number of modes: 724
+35 15
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 2143
+Computing Final Image
+Final number of modes: 635
+35 20
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 2429
+Computing Final Image
+Final number of modes: 758
+35 20
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 2429
+Computing Final Image
+Final number of modes: 670
+35 25
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 2642
+Computing Final Image
+Final number of modes: 760
+35 25
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 2642
+Computing Final Image
+Final number of modes: 683
+35 30
+Computing gradient
+Computing Mode Positions
+Initial number of modes: 2908
+Computing Final Image
+Final number of modes: 806
