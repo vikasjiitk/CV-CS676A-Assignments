@@ -1,1 +1,1 @@
-This will contain the assignments of COmputer Vision Course
+This will contain the assignments of Computer Vision Course
