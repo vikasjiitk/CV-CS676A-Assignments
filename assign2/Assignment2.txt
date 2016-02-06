@@ -5,5 +5,3 @@ A interest point detection step based on Harris corner detector. You will experi
 A interest point descriptor using 16 histograms of gradients for the 16 sub regions (4 by 4) of the patch
 A matching step based on sum of squared distances (SSD) between the different interest points in the given pair of images (data given below)
 Dataset to be used consists of pair of images given in the directory over here.
-
-Assignment 2 due 10th February 2016
