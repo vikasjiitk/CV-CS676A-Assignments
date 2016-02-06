@@ -5,13 +5,12 @@ import math
 filename = sys.argv[1]
 img = cv2.imread(filename)
 window=4
-threshold=4000
+threshold=8000
 height, width, channels = img.shape
-#imgLAB = [[[0 for i in range(3)] for j in range(width)] for k in range(height)]
-imgLAB = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-gray_img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
+gray_img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 ix = [[0 for i in range(max(width,height))] for j in range(max(width,height))]
 iy = [[0 for i in range(max(width,height))] for j in range(max(width,height))]
+direc = [[0 for i in range(max(width,height))] for j in range(max(width,height))]
 f = [[0 for i in range(max(width,height))] for j in range(max(width,height))]
 im = gray_img
 # cv2.imshow('image',gray_img)
@@ -29,6 +28,7 @@ for i in range(height):
 			iy[i][j]=int(gray_img[height-1][j])-int(gray_img[height-2][j])
 		else:
 			iy[i][j]=(int(gray_img[i+1][j])-int(gray_img[i-1][j]))/2
+		direc[i][j]=direction(ix[i][j],iy[i][j])
 for i in range(height):
 	for j in range(width):
 		val1=0
@@ -49,10 +49,32 @@ for i in range(height):
 		else:
 			im[i][j]=0
 		# print f[i][j]
-print max(max(f))
-data=np.array([f[x/height][x%width] for x in range(height*width)])
-hist,bins=np.histogram(data,bins=np.linspace(0,27000,400))
-print(hist)
+
+# print max(max(f))
+# data=np.array([f[x/height][x%width] for x in range(height*width)])
+# hist,bins=np.histogram(data,bins=np.linspace(0,27000,400))
+# print(hist)
+im2=im
+# for i in range(1,height-1):
+# 	for j in range(1,width-1):
+# 		im[i][j]=(im[i][j-1]+im[i][j+1]+im[i+1][j-1]+im[i+1][j]+im[i+1][j+1]+im[i-1][j-1]+im[i-1][j+1]+im[i-1][j]+im[i][j])/9
+windo=10
+ip=[]
+for i in range(1,height-1):
+	for j in range(1,width-1):
+		temp=[0,0,0,0,0,0,0,0]
+		flag=0
+		for k in range(max(0,i-windo),min(height,i+windo)):
+			for l in range(max(0,j-windo),min(width,j+windo)):
+				if(im[i][j]<im[k][l]):
+					flag=1
+					break
+		if(flag==1):
+			im2[i][j]=0
+		else:
+
+		# 	im2[i][j]=1
 # cv2.imshow('image',im)
 cv2.imwrite(filename[:-4]+'lam.png',im)
+cv2.imwrite(filename[:-4]+'lam1.png',im2)
 # cv2.waitKey(0)
