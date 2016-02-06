@@ -112,6 +112,22 @@ def ip(filename):
 				ip.append(temp)
 		# 	im2[i][j]=1
 	return [im,ip]
+	
+def SSD(hog1, hog2):
+	ssd = 0
+	for i in len(hog1):
+		ssd += (hog1[i] - hog2[i])**2
+	return ssd
+
+def intersection(ip1, ip2):
+	match = {}
+	for i in ip1:
+		lssd = 7**8
+		for j in ip2:
+			ssd = SSD(i,j)
+			if (ssd < lssd):
+				lssd = ssd
+				match[i] = j
 # cv2.imshow('image',im)
 [ip1image,ip1]=ip(filename1)
 [ip2image,ip2]=ip(filename2)
