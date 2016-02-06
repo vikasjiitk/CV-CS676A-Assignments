@@ -109,7 +109,7 @@ def ip(filename):
 			if(flag==1):
 				im2[i][j]=0
 			else:
-				ip.append(temp)
+				ip.append(temp,[i,j])
 		# 	im2[i][j]=1
 	return [im,ip]
 
@@ -126,16 +126,16 @@ def intersection(ip1, ip2):
 		lssd = 7**8
 		no_ip2 = 0
 		for j in ip2:
-			ssd = SSD(i,j)
+			ssd = SSD(i[0],j[0])
 			if (ssd < lssd):
 				lssd = ssd
-				match[i] = no_ip2
+				match[no_ip1] = no_ip2
 			no_ip2 += 1
 		no_ip1 += 1
 # cv2.imshow('image',im)
 [ip1image,ip1]=ip(filename1)
 [ip2image,ip2]=ip(filename2)
-# intersection(ip1,ip2)
+intersection(ip1,ip2)
 cv2.imwrite(filename1[:-4]+'lam.png',ip1image)
 cv2.imwrite(filename2[:-4]+'lam.png',ip2image)
 # cv2.waitKey(0)
