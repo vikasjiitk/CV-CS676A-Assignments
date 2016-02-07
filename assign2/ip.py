@@ -87,10 +87,10 @@ def ip(filename):
 				im[i][j]=0
 			# print f[i][j]
 
-	print max(max(f))
-	data=np.array([f[x/height][x%width] for x in range(height*width)])
-	hist,bins=np.histogram(data,bins=np.linspace(0,max(max(f)),max(max(f))/20))
-	print(hist)
+	# print max(max(f))
+	# data=np.array([f[x/height][x%width] for x in range(height*width)])
+	# hist,bins=np.histogram(data,bins=np.linspace(0,max(max(f)),max(max(f))/20))
+	# print(hist)
 	im2=im
 	# for i in range(1,height-1):
 	# 	for j in range(1,width-1):
@@ -130,7 +130,7 @@ def ip(filename):
 
 def SSD(hog1, hog2):
 	ssd = 0
-	for i in len(hog1):
+	for i in range(len(hog1)):
 		ssd += (hog1[i] - hog2[i])**2
 	return ssd
 
@@ -139,17 +139,18 @@ def intersection(ip1, ip2):
 	no_ip1 = 0
 	for i in ip1:
 		fl=0
-		lssd = 128
+		lssd = 1280
 		no_ip2 = 0
 		for j in ip2:
 			ssd = SSD(i[0],j[0])
 			if (ssd < lssd):
 				lssd = ssd
+				temp=j
 				fl=1
 			no_ip2 += 1
 		no_ip1 += 1
 		if(fl==1):
-			match.append([i,j])
+			match.append([i[1],temp[1]])
 	return match
 
 
@@ -159,6 +160,9 @@ def intersection(ip1, ip2):
 # for x in ip1:
 # 	print x
 match = intersection(ip1,ip2)
+for x in match:
+	print x
+# print match
 cv2.imwrite(filename1[:-4]+'lam.png',ip1image)
 cv2.imwrite(filename2[:-4]+'lam.png',ip2image)
 # cv2.waitKey(0)
