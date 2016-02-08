@@ -171,7 +171,10 @@ hdif = (h1-h2)/2
 newimg = np.zeros((nHeight, nWidth, 3), np.uint8)
 newimg[hdif:hdif+h2, :w2] = img2
 newimg[:h1, w2:w1+w2] = img1
-
+for i in range(len(matches)):
+	pt_a = (int(matches[i][1][0]), int(matches[i][1][1]hdif))
+    pt_b = (int(matches[i][0][0]+w2), int(matches[i][0][1]))
+	cv2.line(newimg, pt_a, pt_b, (255, 0, 0))
 cv2.imwrite(filename1[:-4]+'lam.png',ip1image)
 cv2.imwrite(filename2[:-4]+'lam.png',ip2image)
 # cv2.waitKey(0)
