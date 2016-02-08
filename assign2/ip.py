@@ -7,6 +7,11 @@ filename2 = sys.argv[2]
 window=4
 threshold=1200
 # cv2.imshow('image',gray_img)
+#threshold
+#gradient window
+#padding
+#weighted summation for hessian matrix
+# window size of interest point descriptor
 def direction(ix,iy):
 	if(ix!=0):
 		m = iy*1.0/ix
