@@ -111,7 +111,7 @@ def ip(filename):
 			else:
 				ip.append(temp,[i,j])
 		# 	im2[i][j]=1
-	return [im,ip]
+	return [img,im,ip]
 
 def SSD(hog1, hog2):
 	ssd = 0
@@ -133,9 +133,22 @@ def intersection(ip1, ip2):
 			no_ip2 += 1
 		no_ip1 += 1
 # cv2.imshow('image',im)
-[ip1image,ip1]=ip(filename1)
-[ip2image,ip2]=ip(filename2)
-intersection(ip1,ip2)
+[img1,ip1image,ip1]=ip(filename1)
+[img2,ip2image,ip2]=ip(filename2)
+
+matches = intersection(ip1,ip2)
+
+h1, w1 = img1.shape[:2]
+h2, w2 = img2.shape[:2]
+nWidth = w1+w2
+nHeight = max(h1, h2)
+hdif = (h1-h2)/2
+newimg = np.zeros((nHeight, nWidth, 3), np.uint8)
+newimg[hdif:hdif+h2, :w2] = img2
+newimg[:h1, w2:w1+w2] = img1
+
+
+
 cv2.imwrite(filename1[:-4]+'lam.png',ip1image)
 cv2.imwrite(filename2[:-4]+'lam.png',ip2image)
 # cv2.waitKey(0)
