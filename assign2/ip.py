@@ -81,12 +81,18 @@ def ip(filename):
 			else:
 				f[i][j]=(val1*val3-val2**2)/(val1+val3)
 			f[i][j]/=(window**2)
+
+			# print f[i][j]
+	su = 0
+	for x in range(len(f)):
+		su += sum(f[x])
+	threshold = 1.5*float(su)/len(f)/len(f[0])
+	for i in range(height):
+		for j in range(width):
 			if(f[i][j]>threshold):
 				im[i][j]=f[i][j]
 			else:
 				im[i][j]=0
-			# print f[i][j]
-
 	# print max(max(f))
 	# data=np.array([f[x/height][x%width] for x in range(height*width)])
 	# hist,bins=np.histogram(data,bins=np.linspace(0,max(max(f)),max(max(f))/20))
@@ -96,10 +102,10 @@ def ip(filename):
 	# 	for j in range(1,width-1):
 	# 		im[i][j]=(im[i][j-1]+im[i][j+1]+im[i+1][j-1]+im[i+1][j]
 	# +im[i+1][j+1]+im[i-1][j-1]+im[i-1][j+1]+im[i-1][j]+im[i][j])/9
-	windo=8
+	windo=15
 	points=[]
-	for i in range(1,height-1):
-		for j in range(1,width-1):
+	for i in range(5,height-5):
+		for j in range(5,width-5):
 			if(im[i][j]==0):
 				continue
 			flag=0
@@ -115,7 +121,7 @@ def ip(filename):
 		# 	im2[i][j]=1
 	# print len(points)
 	ip=[]
-	windo2=10
+	windo2=15
 	for i in range(len(points)):
 		temp=[0,0,0,0,0,0,0,0]
 		for k in range(max(0,points[i][0]-windo2),min(height,points[i][0]+windo2)):
@@ -140,7 +146,7 @@ def intersection(ip1, ip2):
 	no_ip1 = 0
 	for i in ip1:
 		fl=0
-		lssd = 1280
+		lssd = 1280000
 		no_ip2 = 0
 		for j in ip2:
 			ssd = SSD(i[0],j[0])
@@ -173,10 +179,10 @@ hdif = (h1-h2)/2
 newimg = np.zeros((nHeight, nWidth, 3), np.uint8)
 newimg[hdif:hdif+h2, :w2] = img2
 newimg[:h1, w2:w1+w2] = img1
-for i in range(50):
+for i in range(min(len(matches),50)):
 	pt_a = (int(matches[i][1][1]), int(matches[i][1][0]+hdif))
 	pt_b = (int(matches[i][0][1]+w2), int(matches[i][0][0]))
-	cv2.line(newimg, pt_a, pt_b, (0, 0, 255))
+	cv2.line(newimg, pt_a, pt_b, (0, 255, 0))
 cv2.imwrite(filename1[:-4]+'combine.png',newimg)
 cv2.imwrite(filename1[:-4]+'lam.png',ip1image)
 cv2.imwrite(filename2[:-4]+'lam.png',ip2image)
