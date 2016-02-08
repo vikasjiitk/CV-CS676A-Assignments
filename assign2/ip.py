@@ -151,7 +151,7 @@ def intersection(ip1, ip2):
 			no_ip2 += 1
 		no_ip1 += 1
 		if(fl==1):
-			match.append([i[1],temp[1]])
+			match.append([i[1],temp[1],lssd])
 	return match
 
 
@@ -160,6 +160,7 @@ def intersection(ip1, ip2):
 [img2,ip2image,ip2]=ip(filename2)
 
 matches = intersection(ip1,ip2)
+matches = sorted(matches,key=lambda matches: matches[2])
 for x in matches:
 	print x
 # print match
@@ -171,10 +172,11 @@ hdif = (h1-h2)/2
 newimg = np.zeros((nHeight, nWidth, 3), np.uint8)
 newimg[hdif:hdif+h2, :w2] = img2
 newimg[:h1, w2:w1+w2] = img1
-for i in range(len(matches)):
-	pt_a = (int(matches[i][1][0]), int(matches[i][1][1]hdif))
-    pt_b = (int(matches[i][0][0]+w2), int(matches[i][0][1]))
-	cv2.line(newimg, pt_a, pt_b, (255, 0, 0))
+for i in range(50):
+	pt_a = (int(matches[i][1][0]), int(matches[i][1][1]+hdif))
+	pt_b = (int(matches[i][0][0]+w2), int(matches[i][0][1]))
+	cv2.line(newimg, pt_a, pt_b, (0, 0, 255))
+cv2.imwrite(filename1[:-4]+'combine.png',newimg)
 cv2.imwrite(filename1[:-4]+'lam.png',ip1image)
 cv2.imwrite(filename2[:-4]+'lam.png',ip2image)
 # cv2.waitKey(0)
