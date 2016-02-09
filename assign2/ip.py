@@ -9,13 +9,13 @@ window = int(sys.argv[4])
 thres_factor  = float(sys.argv[3])
 windo = int(sys.argv[5])
 windo2 = int(sys.argv[6])
-ssd_thres = 0.8
+ssd_thres = 0.95
 ############### Parameters to tune
-# thres_factor
+# thres_factor  (parameter)
 # padding
-# Hessian Matrix - window
-# lamda- maximum window - windo
-# descriptor size - windo2
+# H Matrix - window 5
+# lamda- maximum window - windo 15
+# descriptor size - windo2 (parameters)
 ##################
 def direction(ix,iy):
 	if(ix!=0):
@@ -147,7 +147,7 @@ def ip(filename):
 							temp[direc[px][py]]=temp[direc[px][py]]+1
 				for hist in temp:
 					desc.append(hist)
-		print desc
+		# print desc
 		# for k in range(k1, k1+patch)
 		# for k in range(max(0,points[i][0]-windo2),min(height,points[i][0]+windo2)):
 		# 	for l in range(max(0,points[i][1]-windo2),min(width,points[i][1]+windo2)):
@@ -180,8 +180,8 @@ def intersection(ip1, ip2):
 	no = 0
 	for i in range(len(results[0])):
 		if (results[0][i][0]/results[0][i][1] <= ssd_thres ):
-			IP1 = ts_data[results[1][i][0]]
-			IP2 = tr_data[i]
+			IP2 = tr_data[results[1][i][0]]
+			IP1 = ts_data[i]
 			match.append([IP1, IP2, results[0][i][0]])
 			no += 1
 	print no
