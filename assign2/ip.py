@@ -4,8 +4,11 @@ import numpy as np
 import math
 filename1= sys.argv[1]
 filename2 = sys.argv[2]
-window=4
-threshold=1200
+window = int(sys.argv[4])
+thres_factor  = float(sys.argv[3])
+windo = int(sys.argv[5])
+windo2 = int(sys.argv[6])
+# print thres_factor
 # cv2.imshow('image',gray_img)
 #threshold
 #gradient window
@@ -91,7 +94,7 @@ def ip(filename):
 	su = 0
 	for x in range(len(f)):
 		su += sum(f[x])
-	threshold = 1.5*float(su)/len(f)/len(f[0])
+	threshold = thres_factor*float(su)/len(f)/len(f[0])
 	for i in range(height):
 		for j in range(width):
 			if(f[i][j]>threshold):
@@ -107,7 +110,6 @@ def ip(filename):
 	# 	for j in range(1,width-1):
 	# 		im[i][j]=(im[i][j-1]+im[i][j+1]+im[i+1][j-1]+im[i+1][j]
 	# +im[i+1][j+1]+im[i-1][j-1]+im[i-1][j+1]+im[i-1][j]+im[i][j])/9
-	windo=15
 	points=[]
 	for i in range(5,height-5):
 		for j in range(5,width-5):
@@ -126,7 +128,6 @@ def ip(filename):
 		# 	im2[i][j]=1
 	# print len(points)
 	ip=[]
-	windo2=15
 	for i in range(len(points)):
 		temp=[0,0,0,0,0,0,0,0]
 		for k in range(max(0,points[i][0]-windo2),min(height,points[i][0]+windo2)):
@@ -177,18 +178,20 @@ matches = sorted(matches,key=lambda matches: matches[2])
 # print match
 h1, w1 = img1.shape[:2]
 h2, w2 = img2.shape[:2]
-print h1,w1,h2,w2
+# print h1,w1,h2,w2
 nWidth = w1+w2
 nHeight = max(h1, h2)
 hdif = (h1-h2)/2
 newimg = np.zeros((nHeight, nWidth, 3), np.uint8)
 newimg[hdif:hdif+h2, :w2] = img2
 newimg[:h1, w2:w1+w2] = img1
-for i in range(min(len(matches),50)):
+for i in range(min(len(matches),30)):
 	pt_a = (int(matches[i][1][1]), int(matches[i][1][0]+hdif))
 	pt_b = (int(matches[i][0][1]+w2), int(matches[i][0][0]))
-	cv2.line(newimg, pt_a, pt_b, (0, 255, 0))
-cv2.imwrite(filename1[:-4]+'combine.png',newimg)
-cv2.imwrite(filename1[:-4]+'lam.png',ip1image)
-cv2.imwrite(filename2[:-4]+'lam.png',ip2image)
+	cv2.line(newimg, pt_a, pt_b, (0, 255, 0),1)
+	cv2.circle(newimg,(matches[i][1][1],matches[i][1][0]+hdif), 3 , (0,0,255), -1)
+	cv2.circle(newimg,(matches[i][0][1]+w2,matches[i][0][0]), 3, (0,0,255), -1)
+cv2.imwrite(filename1[:-4]+str(thres_factor)+str(window)+str(windo)+str(windo2)+'combine.png',newimg)
+cv2.imwrite(filename1[:-4]+str(thres_factor)+str(window)+str(windo)+str(windo2)+'lam.png',ip1image)
+cv2.imwrite(filename2[:-4]+str(thres_factor)+str(window)+str(windo)+str(windo2)+'lam.png',ip2image)
 # cv2.waitKey(0)
