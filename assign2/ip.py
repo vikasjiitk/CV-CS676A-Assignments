@@ -9,7 +9,7 @@ window = int(sys.argv[4])
 thres_factor  = float(sys.argv[3])
 windo = int(sys.argv[5])
 windo2 = int(sys.argv[6])
-ssd_thres = 0.95
+ssd_thres = 0.9
 ############### Parameters to tune
 # thres_factor  (parameter)
 # padding
@@ -131,6 +131,7 @@ def ip(filename):
 	# print len(points)
 	ip=[]
 	for i in range(len(points)):
+		print points[i]
 		desc = []
 		k1 = max(0,points[i][0]-windo2)
 		k2 = min(height,points[i][0]+windo2)
@@ -160,30 +161,37 @@ def ip(filename):
 	return [img,im2,ip]
 
 
-def SSD(hog1, hog2):
-	ssd = 0
-	for i in range(len(hog1)):
-		ssd += (hog1[i] - hog2[i])**2
-	return ssd
+# def SSD(hog1, hog2):
+# 	ssd = 0
+# 	for i in range(len(hog1)):
+# 		ssd += (hog1[i] - hog2[i])**2
+# 	return ssd
 
 def intersection(ip1, ip2):
 	neigh = NearestNeighbors(n_neighbors = 2, metric = 'l2')
 	tr_data = []
+	tr_points = []
 	for i in ip2:
 		tr_data.append(i[0])
+		tr_points.append(i[1])
 	ts_data = []
+	ts_points = []
 	for i in ip1:
 		ts_data.append(i[0])
+		ts_points.append(i[1])
 	neigh.fit(tr_data)
 	results = neigh.kneighbors(ts_data, 2, return_distance = True)
 	match = []
 	no = 0
+	notot = 0
 	for i in range(len(results[0])):
+		notot += 1
 		if (results[0][i][0]/results[0][i][1] <= ssd_thres ):
-			IP2 = tr_data[results[1][i][0]]
-			IP1 = ts_data[i]
+			IP2 = tr_points[results[1][i][0]]
+			IP1 = ts_points[i]
 			match.append([IP1, IP2, results[0][i][0]])
 			no += 1
+	print notot
 	print no
 	return match
 # def intersection(ip1, ip2):
@@ -224,7 +232,7 @@ hdif = (h1-h2)/2
 newimg = np.zeros((nHeight, nWidth, 3), np.uint8)
 newimg[hdif:hdif+h2, :w2] = img2
 newimg[:h1, w2:w1+w2] = img1
-for i in range(min(len(matches),30)):
+for i in range(len(matches)):
 	pt_a = (int(matches[i][1][1]), int(matches[i][1][0]+hdif))
 	pt_b = (int(matches[i][0][1]+w2), int(matches[i][0][0]))
 	cv2.line(newimg, pt_a, pt_b, (0, 255, 0),1)
@@ -233,4 +241,4 @@ for i in range(min(len(matches),30)):
 cv2.imwrite(filename1[:-4]+str(thres_factor)+str(window)+str(windo)+str(windo2)+'combine.png',newimg)
 cv2.imwrite(filename1[:-4]+str(thres_factor)+str(window)+str(windo)+str(windo2)+'lam.png',ip1image)
 cv2.imwrite(filename2[:-4]+str(thres_factor)+str(window)+str(windo)+str(windo2)+'lam.png',ip2image)
-cv2.waitKey(0)
+# cv2.waitKey(0)
