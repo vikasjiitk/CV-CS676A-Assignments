@@ -5,11 +5,13 @@ import math
 from sklearn.neighbors import NearestNeighbors
 filename1= sys.argv[1]
 filename2 = sys.argv[2]
-window = int(sys.argv[4])
+# window = int(sys.argv[4])
 thres_factor  = float(sys.argv[3])
-windo = int(sys.argv[5])
-windo2 = int(sys.argv[6])
-ssd_thres = 0.9
+# windo = int(sys.argv[5])
+windo2 = int(sys.argv[4])
+window=5
+windo=15
+# ssd_thres = 0.97
 ############### Parameters to tune
 # thres_factor  (parameter)
 # padding
@@ -131,7 +133,7 @@ def ip(filename):
 	# print len(points)
 	ip=[]
 	for i in range(len(points)):
-		print points[i]
+		# print points[i]
 		desc = []
 		k1 = max(0,points[i][0]-windo2)
 		k2 = min(height,points[i][0]+windo2)
@@ -186,11 +188,11 @@ def intersection(ip1, ip2):
 	notot = 0
 	for i in range(len(results[0])):
 		notot += 1
-		if (results[0][i][0]/results[0][i][1] <= ssd_thres ):
-			IP2 = tr_points[results[1][i][0]]
-			IP1 = ts_points[i]
-			match.append([IP1, IP2, results[0][i][0]])
-			no += 1
+		# if (results[0][i][0]/results[0][i][1] <= ssd_thres ):
+		IP2 = tr_points[results[1][i][0]]
+		IP1 = ts_points[i]
+		match.append([IP1, IP2, results[0][i][0]/results[0][i][1]])
+		no += 1
 	print notot
 	print no
 	return match
@@ -232,7 +234,7 @@ hdif = (h1-h2)/2
 newimg = np.zeros((nHeight, nWidth, 3), np.uint8)
 newimg[hdif:hdif+h2, :w2] = img2
 newimg[:h1, w2:w1+w2] = img1
-for i in range(len(matches)):
+for i in range(min(len(matches),50)):
 	pt_a = (int(matches[i][1][1]), int(matches[i][1][0]+hdif))
 	pt_b = (int(matches[i][0][1]+w2), int(matches[i][0][0]))
 	cv2.line(newimg, pt_a, pt_b, (0, 255, 0),1)
