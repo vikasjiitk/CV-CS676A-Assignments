@@ -2,19 +2,21 @@ import sys
 import cv2
 import numpy as np
 import math
+from sklearn.neighbors import NearestNeighbors
 filename1= sys.argv[1]
 filename2 = sys.argv[2]
 window = int(sys.argv[4])
 thres_factor  = float(sys.argv[3])
 windo = int(sys.argv[5])
 windo2 = int(sys.argv[6])
-# print thres_factor
-# cv2.imshow('image',gray_img)
-#threshold
-#gradient window
-#padding
-#weighted summation for hessian matrix
-# window size of interest point descriptor
+ssd_thres = 0.8
+############### Parameters to tune
+# thres_factor
+# padding
+# Hessian Matrix - window
+# lamda- maximum window - windo
+# descriptor size - windo2
+##################
 def direction(ix,iy):
 	if(ix!=0):
 		m = iy*1.0/ix
@@ -129,15 +131,32 @@ def ip(filename):
 	# print len(points)
 	ip=[]
 	for i in range(len(points)):
-		temp=[0,0,0,0,0,0,0,0]
-		for k in range(max(0,points[i][0]-windo2),min(height,points[i][0]+windo2)):
-			for l in range(max(0,points[i][1]-windo2),min(width,points[i][1]+windo2)):
-				if(direc[k][l]!=-1):
-					temp[direc[k][l]]=temp[direc[k][l]]+1
+		desc = []
+		k1 = max(0,points[i][0]-windo2)
+		k2 = min(height,points[i][0]+windo2)
+		l1 = max(0,points[i][1]-windo2)
+		l2 = min(width,points[i][1]+windo2)
+		patchx = np.linspace(k1,k2,5)
+		patchy = np.linspace(l1,l2,5)
+		for k in range(4):
+			for l in range(4):
+				temp=[0,0,0,0,0,0,0,0]
+				for px in range(int(patchx[k]),int(patchx[k+1])):
+					for py in range(int(patchy[l]), int(patchy[l+1])):
+						if(direc[px][py]!=-1):
+							temp[direc[px][py]]=temp[direc[px][py]]+1
+				for hist in temp:
+					desc.append(hist)
+		print desc
+		# for k in range(k1, k1+patch)
+		# for k in range(max(0,points[i][0]-windo2),min(height,points[i][0]+windo2)):
+		# 	for l in range(max(0,points[i][1]-windo2),min(width,points[i][1]+windo2)):
+		# 		if(direc[k][l]!=-1):
+		# 			temp[direc[k][l]]=temp[direc[k][l]]+1
 		# for j in range(len(temp)):
 		# 	temp[j]=temp[j]*1.0/(windo2**2)/4
 		# print temp
-		ip.append([temp,points[i]])
+		ip.append([desc,points[i]])
 	return [img,im2,ip]
 
 
@@ -148,29 +167,49 @@ def SSD(hog1, hog2):
 	return ssd
 
 def intersection(ip1, ip2):
-	match = []
-	no_ip1 = 0
+	neigh = NearestNeighbors(n_neighbors = 2, metric = 'l2')
+	tr_data = []
+	for i in ip2:
+		tr_data.append(i[0])
+	ts_data = []
 	for i in ip1:
-		fl=0
-		lssd = 1280000
-		no_ip2 = 0
-		for j in ip2:
-			ssd = SSD(i[0],j[0])
-			if (ssd < lssd):
-				lssd = ssd
-				temp=j
-				fl=1
-			no_ip2 += 1
-		no_ip1 += 1
-		if(fl==1):
-			match.append([i[1],temp[1],lssd])
+		ts_data.append(i[0])
+	neigh.fit(tr_data)
+	results = neigh.kneighbors(ts_data, 2, return_distance = True)
+	match = []
+	no = 0
+	for i in range(len(results[0])):
+		if (results[0][i][0]/results[0][i][1] <= ssd_thres ):
+			IP1 = ts_data[results[1][i][0]]
+			IP2 = tr_data[i]
+			match.append([IP1, IP2, results[0][i][0]])
+			no += 1
+	print no
 	return match
+# def intersection(ip1, ip2):
+# 	match = []
+# 	no_ip1 = 0
+# 	for i in ip1:
+# 		fl=0
+# 		lssd = 1280000
+# 		no_ip2 = 0
+# 		for j in ip2:
+# 			ssd = SSD(i[0],j[0])
+# 			if (ssd < lssd):
+# 				lssd = ssd
+# 				temp=j
+# 				fl=1
+# 			no_ip2 += 1
+# 		no_ip1 += 1
+# 		if(fl==1):
+# 			match.append([i[1],temp[1],lssd])
+# 	return match
 
 
 # cv2.imshow('image',im)
 [img1,ip1image,ip1]=ip(filename1)
 [img2,ip2image,ip2]=ip(filename2)
-
+# intersection(ip1,ip2)
 matches = intersection(ip1,ip2)
 matches = sorted(matches,key=lambda matches: matches[2])
 # for x in matches:
@@ -194,4 +233,4 @@ for i in range(min(len(matches),30)):
 cv2.imwrite(filename1[:-4]+str(thres_factor)+str(window)+str(windo)+str(windo2)+'combine.png',newimg)
 cv2.imwrite(filename1[:-4]+str(thres_factor)+str(window)+str(windo)+str(windo2)+'lam.png',ip1image)
 cv2.imwrite(filename2[:-4]+str(thres_factor)+str(window)+str(windo)+str(windo2)+'lam.png',ip2image)
-# cv2.waitKey(0)
+cv2.waitKey(0)
