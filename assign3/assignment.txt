@@ -1,0 +1,2 @@
+Scalable Vocabulary Recognition Tree In this assignment you have to implement the scalable vocabulary recognition tree as described in the paper by Nister and Strewenius, CVPR 2006. You are allowed to use a library for k-means and SIFT feature. You have to evaluate the method with different branch factors and depth factors and evaluate the matching on the UKY dataset.
+Deadline: 2nd March 2016
