@@ -1,30 +1,41 @@
 import random
 import glob
 import cv2
+import math
 from sklearn.cluster import KMeans
 from multiprocessing import Queue
+from collections import defaultdict
 import numpy as np
 from Queue import *
 numclusters = 4
 numpoints = 0
 maxlevel = 10
-maxval=10000000
+maxval = 10000000
 maxleafno=(numclusters)**maxlevel
 source_dir = 'dataset/'
-query_dir= 'query/'
+query_dir= 'tquery/'
 dfileList = glob.glob(source_dir + '/*.jpg')
+dnorm = [1 for i in range(len(dfileList))]
+qnorm = 1
 qfileList = glob.glob(query_dir + '/*.jpg')
-image_points = []
 invfilepoint=[[] for i in range(maxleafno)]
 leafnodes=0
+
+def leaders(xs):
+    counts = defaultdict(int)
+    for x in xs:
+        counts[x] += 1
+    return sorted(counts.items(), reverse=True, key=lambda tup: tup[1])
+
 def sift_space(fileList):
+	image_points = []
 	no_images = len(fileList)
 	no_sift = 50
 	numpoints = no_images*no_sift
 	X = np.zeros((numpoints,128))
 	i = 0
-	# sift = cv2.xfeatures2d.SIFT_create()
-	sift = cv2.SIFT()
+	sift = cv2.xfeatures2d.SIFT_create()
+	# sift = cv2.SIFT()
 	no_im = 0
 	for fil in fileList:
 		# print fil
@@ -44,7 +55,7 @@ def sift_space(fileList):
 		cv2.imwrite('a'+fil[:-4]+'2.jpg',img)
 	# print X[0:i]
 	# print image_points
-	return X[0:i]
+	return [X[0:i],image_points]
 
 def cluster(dat):
 	if(numclusters>len(dat)):
@@ -77,9 +88,9 @@ def dist(ip1, ip2):
 	return su
 
 def invfile(filenum):
-	[start, end] = image_points[filenum]
+	[start, end] = d_image_points[filenum]
 	for i in range(start,end):
-		ip=X[i]
+		ip=dX[i]
 		val=maxval
 		cennum=0
 		for j in range(maxlevel):
@@ -94,13 +105,15 @@ def invfile(filenum):
 				if(paramc[j][k][1] >= numclusters):
 					count += numclusters
 			if(paramc[j][index][1]<numclusters):
-				invfilepoint[paramc[j][index][2]].append(i)
+				invfilepoint[paramc[j][index][2]].append(filenum) #changed
+				# invfilepoint[paramc[j][index][2]].append(i)
 				break
 			if(j==maxlevel-1):
-				invfilepoint[paramc[j][index][2]].append(i)
+				invfilepoint[paramc[j][index][2]].append(filenum)
+				# invfilepoint[paramc[j][index][2]].append(i)
 			cennum = valcount
 
-def invfilequery(filenum):
+def invfilequery(filenum,image_points,X):
 	leaf=[]
 	[start, end] = image_points[filenum]
 	for i in range(start,end):
@@ -128,8 +141,8 @@ def invfilequery(filenum):
 
 q= Queue()
 # X = np.array([(random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)) for i in range(numpoints)])
-X = sift_space(dfileList)
-y=X[0:i]
+[dX,d_image_points] = sift_space(dfileList)
+y=dX
 q.put(y)
 q.put(1)
 j=0
@@ -166,13 +179,50 @@ while not(q.empty()):
 			centers.append(ncenters[i])
 		# print "centers"
 		# print ncenters
-for i in range(len(image_points)):
+for i in range(len(d_image_points)):
 	invfile(i)
+
 for fil in qfileList:
 	arg = []
 	arg.append(fil)
-	qX, = sift_space(arg)
+	Score_Dict = {}
+	[qX,q_image_points] = sift_space(arg)
+	qleafs = invfilequery(0,q_image_points,qX)
+	qleafs = leaders(qleafs)
+	for i in qleafs:
+		leafnode = i[0]
+		N = len(dfileList)
+		dimages = leaders(invfilepoint[leafnode])
+		Ni = len(dimages)
+		entropy = math.log(float(N)/Ni)
+		qi = entropy*i[1]/qnorm
+		for j in dimages:
+			di = entropy*j[1]/dnorm[j[0]]
+			if j[0] in Score_Dict:
+				Score_Dict[j[0]] += qi*di
+			else:
+				Score_Dict[j[0]] = qi*di
+	rscore = 0
+	for i in Score_Dict.keys():
+		print Score_Dict[i]
+		if(rscore < Score_Dict[i]):
+			rimage = i
+			rscore = Score_Dict[i]
 
-for i in range(len(query_points)):
-	invfilequery(i)
+	img2 = cv2.imread(fil)
+	img1 = cv2.imread(dfileList[rimage])
+
+	h1, w1 = img1.shape[:2]
+	h2, w2 = img2.shape[:2]
+	print h1,h2,w1,w2
+	nWidth = w1+w2
+	nHeight = max(h1, h2)
+	hdif = abs(h1-h2)/2
+	newimg = np.zeros((nHeight, nWidth, 3), np.uint8)
+	newimg[hdif:hdif+h2, :w2] = img2
+	newimg[:h1, w2:w1+w2] = img1
+
+	cv2.imwrite(fil[:-4]+'_result.jpg',newimg)
+
+
 # print type(x)
