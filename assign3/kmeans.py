@@ -82,7 +82,7 @@ def invfile(filenum):
 		ip=X[i]
 		val=maxval
 		cennum=0
-		for j in range(1,maxlevel):
+		for j in range(maxlevel):
 			count =0
 			val=maxval
 			for k in range(cennum,cennum+numclusters):
@@ -106,7 +106,7 @@ def invfilequery(filenum):
 		ip=X[i]
 		val=maxval
 		cennum=0
-		for j in range(1,maxlevel):
+		for j in range(maxlevel):
 			count =0
 			val=maxval
 			for k in range(cennum,cennum+numclusters):
