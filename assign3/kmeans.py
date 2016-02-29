@@ -81,13 +81,7 @@ def invfile(filenum):
 	for i in range(start,end):
 		ip=X[i]
 		val=maxval
-		for j in range(len(paramc[0])):
-			if(dist(ip,paramc[0][j][0])< val):
-				cennum=j
-				val=dist(ip,paramc[0][j][0])
-		if(paramc[0][cennum][1]<numclusters):
-			invfilepoint[paramc[0][cennum][2]].append(i)
-			break
+		cennum=0
 		for j in range(1,maxlevel):
 			count =0
 			val=maxval
@@ -111,13 +105,7 @@ def invfilequery(filenum):
 	for i in range(start,end):
 		ip=X[i]
 		val=maxval
-		for j in range(len(paramc[0])):
-			if(dist(ip,paramc[0][j][0])< val):
-				cennum=j
-				val=dist(ip,paramc[0][j][0])
-		if(paramc[0][cennum][1]<numclusters):
-			leaf.append(paramc[0][cennum][2])
-			break
+		cennum=0
 		for j in range(1,maxlevel):
 			count =0
 			val=maxval
@@ -178,6 +166,6 @@ while not(q.empty()):
 		# print ncenters
 for i in range(len(image_points)):
 	invfile(i)
-# for i in range(len(query_points)):
-# 	invfilequery(i)
+for i in range(len(query_points)):
+	invfilequery(i)
 # print type(x)
