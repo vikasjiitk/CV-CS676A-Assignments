@@ -12,12 +12,12 @@ maxval=10000000
 maxleafno=(numclusters)**maxlevel
 source_dir = 'dataset/'
 query_dir= 'query/'
-fileList = glob.glob(source_dir + '/*.jpg')
+dfileList = glob.glob(source_dir + '/*.jpg')
 qfileList = glob.glob(query_dir + '/*.jpg')
 image_points = []
 invfilepoint=[[] for i in range(maxleafno)]
 leafnodes=0
-def sift_space():
+def sift_space(fileList):
 	no_images = len(fileList)
 	no_sift = 50
 	numpoints = no_images*no_sift
@@ -44,7 +44,7 @@ def sift_space():
 		cv2.imwrite('a'+fil[:-4]+'2.jpg',img)
 	# print X[0:i]
 	# print image_points
-	return [X,i]
+	return X[0:i]
 
 def cluster(dat):
 	if(numclusters>len(dat)):
@@ -128,7 +128,7 @@ def invfilequery(filenum):
 
 q= Queue()
 # X = np.array([(random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)) for i in range(numpoints)])
-[X,i] = sift_space()
+X = sift_space(dfileList)
 y=X[0:i]
 q.put(y)
 q.put(1)
@@ -168,6 +168,11 @@ while not(q.empty()):
 		# print ncenters
 for i in range(len(image_points)):
 	invfile(i)
+for fil in qfileList:
+	arg = []
+	arg.append(fil)
+	qX, = sift_space(arg)
+
 for i in range(len(query_points)):
 	invfilequery(i)
 # print type(x)
