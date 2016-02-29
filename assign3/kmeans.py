@@ -133,7 +133,7 @@ def invfilequery(filenum):
 q= Queue()
 # X = np.array([(random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)) for i in range(numpoints)])
 X = sift_space(dfileList)
-y=X
+y=X[0:i]
 q.put(y)
 q.put(1)
 j=0
