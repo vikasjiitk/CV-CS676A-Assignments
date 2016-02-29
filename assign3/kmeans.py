@@ -88,15 +88,16 @@ def invfile(filenum):
 			for k in range(cennum,cennum+numclusters):
 				# print paramc[j][cennum][i][0]
 				if(dist(ip,paramc[j][k][0])< val):
+					index=k
 					valcount = count
 					val=dist(ip,paramc[j][k][0])
 				if(paramc[j][k][1] >= numclusters):
 					count += numclusters
-			if(paramc[j][valcount][1]<numclusters):
-				invfilepoint[paramc[j][valcount][2]].append(i)
+			if(paramc[j][index][1]<numclusters):
+				invfilepoint[paramc[j][index][2]].append(i)
 				break
 			if(j==maxlevel-1):
-				invfilepoint[paramc[j][valcount][2]].append(i)
+				invfilepoint[paramc[j][index][2]].append(i)
 			cennum = valcount
 
 def invfilequery(filenum):
@@ -112,15 +113,16 @@ def invfilequery(filenum):
 			for k in range(cennum,cennum+numclusters):
 				# print paramc[j][cennum][i][0]
 				if(dist(ip,paramc[j][k][0])< val):
+					index=k
 					valcount = count
 					val=dist(ip,paramc[j][k][0])
 				if(paramc[j][k][1] >= numclusters):
 					count += numclusters
-			if(paramc[j][valcount][1]<numclusters):
-				leaf.append(paramc[j][valcount][2])
+			if(paramc[j][index][1]<numclusters):
+				leaf.append(paramc[j][index][2])
 				break
 			if(j==maxlevel-1):
-				leaf.append(paramc[j][valcount][2])
+				leaf.append(paramc[j][index][2])
 			cennum = valcount
 	return leaf
 
