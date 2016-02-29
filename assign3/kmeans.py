@@ -81,26 +81,29 @@ def invfile(filenum):
 	for i in range(start,end):
 		ip=X[i]
 		val=maxval
-		for j in range(len(paramc[0][0])):
-			if(dist(ip,paramc[0][0][j][0])< val):
+		for j in range(len(paramc[0])):
+			if(dist(ip,paramc[0][j][0])< val):
 				cennum=j
-				val=dist(ip,paramc[0][0][j][0])
-		if(paramc[0][0][cennum][1]<numclusters):
-			invfilepoint[paramc[0][0][cennum][2]].append(i)
+				val=dist(ip,paramc[0][j][0])
+		if(paramc[0][cennum][1]<numclusters):
+			invfilepoint[paramc[0][cennum][2]].append(i)
 			break
 		for j in range(1,maxlevel):
+			count =0
 			val=maxval
-			for k in range(len(paramc[j][cennum])):
+			for k in range(cennum,cennum+numclusters):
 				# print paramc[j][cennum][i][0]
-				if(dist(ip,paramc[j][cennum][k][0])< val):
-					cennumnew=k
-					val=dist(ip,paramc[j][cennum][k][0])
-			if(paramc[j][cennum][cennumnew][1]<numclusters):
-				invfilepoint[paramc[j][cennum][cennumnew][2]].append(i)
+				if(dist(ip,paramc[j][k][0])< val):
+					valcount = count
+					val=dist(ip,paramc[j][k][0])
+				if(paramc[j][k][1] >= numclusters):
+					count += numclusters
+			if(paramc[j][valcount][1]<numclusters):
+				invfilepoint[paramc[j][valcount][2]].append(i)
 				break
 			if(j==maxlevel-1):
-				invfilepoint[paramc[j][cennum][cennumnew][2]].append(i)
-			cennum = cennumnew
+				invfilepoint[paramc[j][valcount][2]].append(i)
+			cennum = valcount
 
 def invfilequery(filenum):
 	leaf=[]
@@ -108,32 +111,35 @@ def invfilequery(filenum):
 	for i in range(start,end):
 		ip=X[i]
 		val=maxval
-		for j in range(len(paramc[0][0])):
-			if(dist(ip,paramc[0][0][j][0])< val):
+		for j in range(len(paramc[0])):
+			if(dist(ip,paramc[0][j][0])< val):
 				cennum=j
-				val=dist(ip,paramc[0][0][j][0])
-		if(paramc[0][0][cennum][1]<numclusters):
-			leaf.append(paramc[0][0][cennum][2])
+				val=dist(ip,paramc[0][j][0])
+		if(paramc[0][cennum][1]<numclusters):
+			leaf.append(paramc[0][cennum][2])
 			break
 		for j in range(1,maxlevel):
+			count =0
 			val=maxval
-			for k in range(len(paramc[j][cennum])):
+			for k in range(cennum,cennum+numclusters):
 				# print paramc[j][cennum][i][0]
-				if(dist(ip,paramc[j][cennum][k][0])< val):
-					cennumnew=k
-					val=dist(ip,paramc[j][cennum][k][0])
-			if(paramc[j][cennum][cennumnew][1]<numclusters):
-				leaf.append(paramc[j][cennum][cennumnew][2])
+				if(dist(ip,paramc[j][k][0])< val):
+					valcount = count
+					val=dist(ip,paramc[j][k][0])
+				if(paramc[j][k][1] >= numclusters):
+					count += numclusters
+			if(paramc[j][valcount][1]<numclusters):
+				leaf.append(paramc[j][valcount][2])
 				break
 			if(j==maxlevel-1):
-				leaf.append(paramc[j][cennum][cennumnew][2])
-			cennum = cennumnew
+				leaf.append(paramc[j][valcount][2])
+			cennum = valcount
 	return leaf
 
 q= Queue()
 # X = np.array([(random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)) for i in range(numpoints)])
 [X,i] = sift_space()
-y=X[0:i-5]
+y=X[0:i]
 q.put(y)
 q.put(1)
 j=0
@@ -167,10 +173,11 @@ while not(q.empty()):
 			else:
 				ncenters[i].append(leafnodes)
 				leafnodes+=1
-		centers.append(ncenters)
+			centers.append(ncenters[i])
+		# print "centers"
 		# print ncenters
 for i in range(len(image_points)):
 	invfile(i)
-for i in range(len(query_points)):
-	invfilequery(i)
+# for i in range(len(query_points)):
+# 	invfilequery(i)
 # print type(x)
