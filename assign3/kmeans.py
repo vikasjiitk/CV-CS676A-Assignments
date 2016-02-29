@@ -9,9 +9,14 @@ numclusters = 4
 numpoints = 0
 maxlevel = 10
 maxval=10000000
+maxleafno=(numclusters)**maxlevel
 source_dir = 'dataset/'
+query_dir= 'query/'
 fileList = glob.glob(source_dir + '/*.jpg')
+qfileList = glob.glob(query_dir + '/*.jpg')
 image_points = []
+invfilepoint=[[] for i in range(maxleafno)]
+leafnodes=0
 def sift_space():
 	no_images = len(fileList)
 	no_sift = 50
@@ -81,7 +86,7 @@ def invfile(filenum):
 				cennum=j
 				val=dist(ip,paramc[0][0][j][0])
 		if(paramc[0][0][cennum][1]<numclusters):
-			paramc[0][0][cennum][2].append(i)
+			invfilepoint[paramc[0][0][cennum][2]].append(i)
 			break
 		for j in range(1,maxlevel):
 			val=maxval
@@ -91,16 +96,44 @@ def invfile(filenum):
 					cennumnew=k
 					val=dist(ip,paramc[j][cennum][k][0])
 			if(paramc[j][cennum][cennumnew][1]<numclusters):
-				paramc[j][cennum][cennumnew][2].append(i)
+				invfilepoint[paramc[j][cennum][cennumnew][2]].append(i)
 				break
 			if(j==maxlevel-1):
-				paramc[j][cennum][cennumnew][2].append(i)
+				invfilepoint[paramc[j][cennum][cennumnew][2]].append(i)
 			cennum = cennumnew
+
+def invfilequery(filenum):
+	leaf=[]
+	[start, end] = image_points[filenum]
+	for i in range(start,end):
+		ip=X[i]
+		val=maxval
+		for j in range(len(paramc[0][0])):
+			if(dist(ip,paramc[0][0][j][0])< val):
+				cennum=j
+				val=dist(ip,paramc[0][0][j][0])
+		if(paramc[0][0][cennum][1]<numclusters):
+			leaf.append(paramc[0][0][cennum][2])
+			break
+		for j in range(1,maxlevel):
+			val=maxval
+			for k in range(len(paramc[j][cennum])):
+				# print paramc[j][cennum][i][0]
+				if(dist(ip,paramc[j][cennum][k][0])< val):
+					cennumnew=k
+					val=dist(ip,paramc[j][cennum][k][0])
+			if(paramc[j][cennum][cennumnew][1]<numclusters):
+				leaf.append(paramc[j][cennum][cennumnew][2])
+				break
+			if(j==maxlevel-1):
+				leaf.append(paramc[j][cennum][cennumnew][2])
+			cennum = cennumnew
+	return leaf
 
 q= Queue()
 # X = np.array([(random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)) for i in range(numpoints)])
 [X,i] = sift_space()
-y=X[0:i]
+y=X[0:i-5]
 q.put(y)
 q.put(1)
 j=0
@@ -114,7 +147,8 @@ while not(q.empty()):
 		q.put(j)
 		if(j> maxlevel):
 			for i in range(len(centers)):
-				centers[i].append([])
+				centers[i].append(leafnodes)
+				leafnodes+=1
 			while not(q.empty()):
 				elem=q.get()
 			# 	if type(elem) is list:
@@ -131,9 +165,12 @@ while not(q.empty()):
 			if(len(x) > numclusters):
 				q.put(x)
 			else:
-				ncenters[i].append([])
+				ncenters[i].append(leafnodes)
+				leafnodes+=1
 		centers.append(ncenters)
 		# print ncenters
 for i in range(len(image_points)):
 	invfile(i)
+for i in range(len(query_points)):
+	invfilequery(i)
 # print type(x)
