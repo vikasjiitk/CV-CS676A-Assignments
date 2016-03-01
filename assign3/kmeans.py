@@ -15,9 +15,11 @@ maxleafno=(numclusters)**maxlevel
 source_dir = 'dataset/'
 query_dir= 'tquery/'
 dfileList = glob.glob(source_dir + '/*.jpg')
+dscore=[]
 dnorm = [1 for i in range(len(dfileList))]
 qnorm = 1
 qfileList = glob.glob(query_dir + '/*.jpg')
+node_entropy=[0 for i in range(maxleafno)]
 invfilepoint=[[] for i in range(maxleafno)]
 leafnodes=0
 
@@ -30,22 +32,21 @@ def leaders(xs):
 def sift_space(fileList):
 	image_points = []
 	no_images = len(fileList)
-	no_sift = 50
+	no_sift = 300
 	numpoints = no_images*no_sift
 	X = np.zeros((numpoints,128))
 	i = 0
-	sift = cv2.xfeatures2d.SIFT_create()
+	sift = cv2.xfeatures2d.SIFT_create(contrastThreshold=0.1, edgeThreshold = 8)
 	# sift = cv2.SIFT()
 	no_im = 0
 	for fil in fileList:
-		# print fil
+		print fil
 		im = cv2.imread(fil);
 		gray= cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
 		(kps, descs) = sift.detectAndCompute(gray, None)
-		# print len(kps)
-		no_sift = min(50, len(kps))
-		# print no_sift
-		# global image_points
+		print len(kps)
+		no_sift = min(300, len(kps))
+		print no_sift
 		image_points.append([i,i+no_sift])
 		no_im += 1
 		X[i:i+no_sift] = descs[0:no_sift]
@@ -89,6 +90,7 @@ def dist(ip1, ip2):
 
 def invfile(filenum):
 	[start, end] = d_image_points[filenum]
+	Dleaf={}
 	for i in range(start,end):
 		ip=dX[i]
 		val=maxval
@@ -107,14 +109,26 @@ def invfile(filenum):
 			if(paramc[j][index][1]<numclusters):
 				invfilepoint[paramc[j][index][2]].append(filenum) #changed
 				# invfilepoint[paramc[j][index][2]].append(i)
-				break
+                		leafno = paramc[j][index][2]
+                		if(leafno in Dleaf):
+                    			Dleaf[leafno] += 1
+                		else:
+                    			Dleaf[leafno] = 1
+                		break
 			if(j==maxlevel-1):
 				invfilepoint[paramc[j][index][2]].append(filenum)
 				# invfilepoint[paramc[j][index][2]].append(i)
+				leafno = paramc[j][index][2]
+				if(leafno in Dleaf):
+					Dleaf[leafno] += 1
+				else:
+					Dleaf[leafno] = 1
 			cennum = valcount
+	dscore.append(Dleaf)
 
 def invfilequery(filenum,image_points,X):
 	leaf=[]
+	Qleaf = {}
 	[start, end] = image_points[filenum]
 	for i in range(start,end):
 		ip=X[i]
@@ -133,11 +147,21 @@ def invfilequery(filenum,image_points,X):
 					count += numclusters
 			if(paramc[j][index][1]<numclusters):
 				leaf.append(paramc[j][index][2])
+				leafno = paramc[j][index][2]
+				if(leafno in Qleaf):
+					Qleaf[leafno] += 1
+				else:
+					Qleaf[leafno] = 1
 				break
 			if(j==maxlevel-1):
 				leaf.append(paramc[j][index][2])
+				leafno = paramc[j][index][2]
+				if(leafno in Qleaf):
+					Qleaf[leafno] += 1
+				else:
+					Qleaf[leafno] = 1
 			cennum = valcount
-	return leaf
+	return [leaf,Qleaf]
 
 q= Queue()
 # X = np.array([(random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)) for i in range(numpoints)])
@@ -182,13 +206,35 @@ while not(q.empty()):
 for i in range(len(d_image_points)):
 	invfile(i)
 
+N = len(dfileList)
+
+for i in range(maxleafno):
+	dimages = leaders(invfilepoint[i])
+	Ni = len(dimages)+1
+	if Ni!=0:
+		node_entropy[i] = math.log(float(N)/Ni)
+
+for i in range(len(dfileList)):
+	Dict = dscore[i]
+	print Dict
+	norm = 0
+	for j in Dict.keys():
+		norm += (Dict[j]*node_entropy[j])**2
+	dnorm[i] = norm
+	print dnorm[i]
+
 for fil in qfileList:
 	arg = []
 	arg.append(fil)
 	Score_Dict = {}
 	[qX,q_image_points] = sift_space(arg)
-	qleafs = invfilequery(0,q_image_points,qX)
+	[qleafs,qdict] = invfilequery(0,q_image_points,qX)
+	print qdict
 	qleafs = leaders(qleafs)
+	qnorm = 0
+	for i in qdict.keys():
+		qnorm += (qdict[i]*node_entropy[i])**2
+
 	for i in qleafs:
 		leafnode = i[0]
 		N = len(dfileList)
@@ -222,7 +268,5 @@ for fil in qfileList:
 	newimg[hdif:hdif+h2, :w2] = img2
 	newimg[:h1, w2:w1+w2] = img1
 
-	cv2.imwrite(fil[:-4]+'_result.jpg',newimg)
+	cv2.imwrite('r'+fil[:-4]+'_result.jpg',newimg)
 
-
-# print type(x)
