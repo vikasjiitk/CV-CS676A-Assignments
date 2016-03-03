@@ -36,8 +36,8 @@ def sift_space(fileList):
 	numpoints = no_images*no_sift
 	X = np.zeros((numpoints,128))
 	i = 0
-	# sift = cv2.xfeatures2d.SIFT_create(contrastThreshold=0.1, edgeThreshold = 8)
-	sift = cv2.SIFT(no_sift,contrastThreshold=0.1, edgeThreshold = 8)
+	sift = cv2.xfeatures2d.SIFT_create(no_sift,contrastThreshold=0.1, edgeThreshold = 8)
+	# sift = cv2.SIFT(no_sift,contrastThreshold=0.1, edgeThreshold = 8)
 	no_im = 0
 	for fil in fileList:
 		# print fil
@@ -48,7 +48,7 @@ def sift_space(fileList):
 		no_sift = min(300, len(kps))
 		# print no_sift
 		image_points.append([i,i+no_sift])
-		no_im += 1	
+		no_im += 1
 		X[i:i+no_sift] = descs[0:no_sift]
 		i += no_sift
 		img = im
@@ -276,4 +276,3 @@ for fil in qfileList:
 	# print "hi"
 	# print fil[:-4]+'_result.jpg'
 	cv2.imwrite(fil[:-4]+'_result.jpg',newimg)
-
