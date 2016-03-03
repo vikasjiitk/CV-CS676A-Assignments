@@ -37,14 +37,14 @@ def sift_space(fileList):
 	X = np.zeros((numpoints,128))
 	i = 0
 	# sift = cv2.xfeatures2d.SIFT_create(contrastThreshold=0.1, edgeThreshold = 8)
-	sift = cv2.SIFT(no_sift,contrastThreshold=0.1, edgeThreshold = 8)
+	sift = cv2.SIFT(nfeatures=no_sift)
 	no_im = 0
 	for fil in fileList:
-		# print fil
+		print fil
 		im = cv2.imread(fil);
 		gray= cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
 		(kps, descs) = sift.detectAndCompute(gray, None)
-		# print len(kps)
+		print len(kps)
 		no_sift = min(300, len(kps))
 		# print no_sift
 		image_points.append([i,i+no_sift])
@@ -110,7 +110,6 @@ def invfile(filenum):
 					count += numclusters
 			if(paramc[j][index][1]<numclusters):
 				invfilepoint[paramc[j][index][2]].append(filenum) #changed
-				# invfilepoint[paramc[j][index][2]].append(i)
                 		leafno = paramc[j][index][2]
                 		if(leafno in Dleaf):
                     			Dleaf[leafno] += 1
@@ -119,7 +118,6 @@ def invfile(filenum):
                 		break
 			if(j==maxlevel-1):
 				invfilepoint[paramc[j][index][2]].append(filenum)
-				# invfilepoint[paramc[j][index][2]].append(i)
 				leafno = paramc[j][index][2]
 				if(leafno in Dleaf):
 					Dleaf[leafno] += 1
@@ -215,7 +213,7 @@ for i in range(maxleafno):
 	dimages = leaders(invfilepoint[i])
 	Ni = len(dimages)+1
 	if Ni!=0:
-		node_entropy[i] = math.log(float(N)/Ni)
+		node_entropy[i] = math.log(float(N)/Ni)+1
 
 for i in range(len(dfileList)):
 	Dict = dscore[i]
@@ -243,8 +241,8 @@ for fil in qfileList:
 		leafnode = i[0]
 		N = len(dfileList)
 		dimages = leaders(invfilepoint[leafnode])
-		Ni = len(dimages)
-		entropy = math.log(float(N)/Ni)
+		Ni = len(dimages)+1
+		entropy = math.log(float(N)/Ni)+1
 		qi = entropy*i[1]/qnorm
 		for j in dimages:
 			di = entropy*j[1]/dnorm[j[0]]
@@ -264,7 +262,7 @@ for fil in qfileList:
 
 	h1, w1 = img1.shape[:2]
 	h2, w2 = img2.shape[:2]
-	# print h1,h2,w1,w2
+	print h1,h2,w1,w2
 	nWidth = w1+w2
 	nHeight = max(h1, h2)
 	hdif = abs(h1-h2)/2
@@ -272,6 +270,5 @@ for fil in qfileList:
 	newimg[hdif:hdif+h2, :w2] = img2
 	newimg[:h1, w2:w1+w2] = img1
 	# print "hi"
-	# print fil[:-4]+'_result.jpg'
-	cv2.imwrite(fil[:-4]+'_result.jpg',newimg)
+	cv2.imwrite("r"+fil[:-4]+'_result.jpg',newimg)
 
