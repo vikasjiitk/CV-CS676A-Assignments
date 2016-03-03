@@ -12,8 +12,10 @@ numpoints = 0
 maxlevel = 5
 maxval = 10000000
 maxleafno=(numclusters)**maxlevel
-source_dir = '../../data/assign3/dataset/'
-query_dir= '../../data/assign3/query/'
+source_dir = '../../data/assign3/sdataset/'
+kres_dir = '../../data/assign3/adataset/'
+query_dir= '../../data/assign3/squery/'
+res_dir = '../../data/assign3/rquery/'
 dfileList = glob.glob(source_dir + '/*.jpg')
 dscore=[]
 dnorm = [1 for i in range(len(dfileList))]
@@ -37,8 +39,8 @@ def sift_space(fileList):
 	X = np.zeros((numpoints,128))
 	i = 0
 
-	# sift = cv2.xfeatures2d.SIFT_create(contrastThreshold=0.1, edgeThreshold = 8)
-	sift = cv2.SIFT(nfeatures=no_sift)
+	sift = cv2.xfeatures2d.SIFT_create(nfeatures=no_sift)
+	# sift = cv2.SIFT(nfeatures=no_sift)
 
 	no_im = 0
 	for fil in fileList:
@@ -55,7 +57,7 @@ def sift_space(fileList):
 		i += no_sift
 		img = im
 		cv2.drawKeypoints(im,kps[0:no_sift],img)
-		cv2.imwrite('a'+fil[:-4]+'2.jpg',img)
+		cv2.imwrite(kres_dir+fil[28:-4]+'2.jpg',img)
 	# print X[0:i]
 	# print image_points
 	return [X[0:i],image_points]
@@ -175,7 +177,7 @@ j=0
 centers=[]
 paramc=[]
 while not(q.empty()):
-	print 'hi'
+	# print 'hi'
 	elem=q.get()
 	if type(elem) is int:
 		# print "new %d"%(j)
@@ -207,13 +209,13 @@ while not(q.empty()):
 		# print "centers"
 		# print ncenters
 for i in range(len(d_image_points)):
-	print "invfile"
+	# print "invfile"
 	invfile(i)
 
 N = len(dfileList)
 
 for i in range(maxleafno):
-	print 'hello'
+	# print 'hello'
 	dimages = leaders(invfilepoint[i])
 	Ni = len(dimages)+1
 	if Ni!=0:
@@ -254,7 +256,7 @@ for fil in qfileList:
 				Score_Dict[j[0]] = qi*di
 	rscore = 0
 	for i in Score_Dict.keys():
-		# print Score_Dict[i]
+		print Score_Dict[i]
 		if(rscore < Score_Dict[i]):
 			rimage = i
 			rscore = Score_Dict[i]
@@ -272,4 +274,4 @@ for fil in qfileList:
 	newimg[hdif:hdif+h2, :w2] = img2
 	newimg[:h1, w2:w1+w2] = img1
 	# print "hi"
-	cv2.imwrite("r"+fil[:-4]+'_result.jpg',newimg)
+	cv2.imwrite(res_dir+fil[26:-4]+'_result.jpg',newimg)
