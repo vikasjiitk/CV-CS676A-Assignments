@@ -9,11 +9,11 @@ import numpy as np
 from Queue import *
 numclusters = 4
 numpoints = 0
-maxlevel = 10
+maxlevel = 5
 maxval = 10000000
 maxleafno=(numclusters)**maxlevel
-source_dir = 'dataset/'
-query_dir= 'tquery/'
+source_dir = '../../data/assign3/dataset/'
+query_dir= '../../data/assign3/query/'
 dfileList = glob.glob(source_dir + '/*.jpg')
 dscore=[]
 dnorm = [1 for i in range(len(dfileList))]
@@ -36,19 +36,19 @@ def sift_space(fileList):
 	numpoints = no_images*no_sift
 	X = np.zeros((numpoints,128))
 	i = 0
-	sift = cv2.xfeatures2d.SIFT_create(contrastThreshold=0.1, edgeThreshold = 8)
-	# sift = cv2.SIFT()
+	# sift = cv2.xfeatures2d.SIFT_create(contrastThreshold=0.1, edgeThreshold = 8)
+	sift = cv2.SIFT(no_sift,contrastThreshold=0.1, edgeThreshold = 8)
 	no_im = 0
 	for fil in fileList:
-		print fil
+		# print fil
 		im = cv2.imread(fil);
 		gray= cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
 		(kps, descs) = sift.detectAndCompute(gray, None)
-		print len(kps)
+		# print len(kps)
 		no_sift = min(300, len(kps))
-		print no_sift
+		# print no_sift
 		image_points.append([i,i+no_sift])
-		no_im += 1
+		no_im += 1	
 		X[i:i+no_sift] = descs[0:no_sift]
 		i += no_sift
 		img = im
@@ -90,6 +90,8 @@ def dist(ip1, ip2):
 
 def invfile(filenum):
 	[start, end] = d_image_points[filenum]
+	if start==end:
+		return
 	Dleaf={}
 	for i in range(start,end):
 		ip=dX[i]
@@ -176,9 +178,10 @@ while not(q.empty()):
 	print 'hi'
 	elem=q.get()
 	if type(elem) is int:
+		# print "new %d"%(j)
 		j+=1
 		q.put(j)
-		if(j> maxlevel):
+		if(j== maxlevel):
 			for i in range(len(centers)):
 				centers[i].append(leafnodes)
 				leafnodes+=1
@@ -197,7 +200,7 @@ while not(q.empty()):
 			x=nX[i]
 			if(len(x) > numclusters):
 				q.put(x)
-			else:
+			elif j<maxlevel-1:
 				ncenters[i].append(leafnodes)
 				leafnodes+=1
 			centers.append(ncenters[i])
@@ -226,6 +229,7 @@ for i in range(len(dfileList)):
 	print dnorm[i]
 
 for fil in qfileList:
+	# print "I am here"
 	arg = []
 	arg.append(fil)
 	Score_Dict = {}
@@ -252,7 +256,7 @@ for fil in qfileList:
 				Score_Dict[j[0]] = qi*di
 	rscore = 0
 	for i in Score_Dict.keys():
-		print Score_Dict[i]
+		# print Score_Dict[i]
 		if(rscore < Score_Dict[i]):
 			rimage = i
 			rscore = Score_Dict[i]
@@ -262,13 +266,14 @@ for fil in qfileList:
 
 	h1, w1 = img1.shape[:2]
 	h2, w2 = img2.shape[:2]
-	print h1,h2,w1,w2
+	# print h1,h2,w1,w2
 	nWidth = w1+w2
 	nHeight = max(h1, h2)
 	hdif = abs(h1-h2)/2
 	newimg = np.zeros((nHeight, nWidth, 3), np.uint8)
 	newimg[hdif:hdif+h2, :w2] = img2
 	newimg[:h1, w2:w1+w2] = img1
-
-	cv2.imwrite('r'+fil[:-4]+'_result.jpg',newimg)
+	# print "hi"
+	# print fil[:-4]+'_result.jpg'
+	cv2.imwrite(fil[:-4]+'_result.jpg',newimg)
 
