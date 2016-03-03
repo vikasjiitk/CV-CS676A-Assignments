@@ -25,6 +25,15 @@ node_entropy=[0 for i in range(maxleafno)]
 invfilepoint=[[] for i in range(maxleafno)]
 leafnodes=0
 
+class node():
+	def __init__(self, cen,lis):
+		self.center=cen
+		self.child=[]
+		if not(lis==[]):
+			for x in lis:
+				self.child.append(x)
+
+
 def leaders(xs):
     counts = defaultdict(int)
     for x in xs:

@@ -99,6 +99,7 @@ def invfile(filenum):
 	Dleaf={}
 	for i in range(start,end):
 		ip=dX[i]
+		val=maxval
 		cennum=0
 		for j in range(maxlevel):
 			count =0
