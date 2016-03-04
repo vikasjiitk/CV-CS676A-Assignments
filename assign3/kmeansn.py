@@ -125,10 +125,10 @@ def invfile(filenum):
 		ip=dX[i]
 		while(nod.leafnum==-1):
 			val=maxval
-			for i in range(len(nod.child)):
-				if(dist(ip,nod.child[i].center)< val):
-					index=i
-					val=dist(ip,nod.child[i].center)
+			for j in range(len(nod.child)):
+				if(dist(ip,nod.child[j].center)< val):
+					index=j
+					val=dist(ip,nod.child[j].center)
 			nod=nod.child[index]
 		leafno=nod.leafnum
 		leafre[leafno]+=1
@@ -149,10 +149,10 @@ def invfilequery(image_points,X):
 		ip=X[i]
 		while(nod.leafnum==-1):
 			val=maxval
-			for i in range(len(nod.child)):
-				if(dist(ip,nod.child[i].center)< val):
-					index=i
-					val=dist(ip,nod.child[i].center)
+			for j in range(len(nod.child)):
+				if(dist(ip,nod.child[j].center)< val):
+					index=j
+					val=dist(ip,nod.child[j].center)
 			nod=nod.child[index]
 		leafno=nod.leafnum
 		leaf.append(leafno)
@@ -171,9 +171,9 @@ buildtree(yn,y,0)
 for i in range(len(d_image_points)):
 	invfile(i)
 for i in range(leafnodes):
-	print leafre[i]
-	print leafde[i]
-	# print invfilepoint[i]
+	# print leafre[i]
+	# print leafde[i]
+	print invfilepoint[i]
 
 N = len(dfileList)
 for i in range(maxleafno):
