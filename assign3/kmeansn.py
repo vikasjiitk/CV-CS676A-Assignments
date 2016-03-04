@@ -24,6 +24,8 @@ qfileList = glob.glob(query_dir + '/*.jpg')
 node_entropy=[0 for i in range(maxleafno)]
 invfilepoint=[[] for i in range(maxleafno)]
 leafnodes=0
+leafde=[0 for i in range(maxleafno)]
+leafre=[0 for i in range(maxleafno)]
 
 class node():
 	def __init__(self, cen):
@@ -75,53 +77,41 @@ def sift_space(fileList):
 	return [X[0:i],image_points]
 
 def cluster(dat):
-	# print len(dat)
-	# print len(dat[0])
 	if(numclusters>len(dat)):
 		return [[dat], [dat[0]]]
 	kmean=KMeans(init='k-means++', n_clusters=numclusters, n_init=10)
 	y=kmean.fit_predict(dat)
-	# print kmean
 	partition=[[] for i in range(numclusters)]
 	for i in range(len(dat)):
 		partition[y[i]].append(dat[i])
-	# for x in partition:
-	# 	print x
-	cluscenter=[]
-	for i in range(numclusters):
-		temp=partition[i][0]
-		for j in range(1,len(partition[i])):
-			temp+= partition[i][j]
-		# temp=temp-partition[i][0]
-		cluscenter.append(temp/len(partition[i]))
-		# cluscenter.append(['center',len(partition[i])])
-		# print len(partition[i])
-	return [partition,cluscenter]
+	return [partition,kmean.cluster_centers_.tolist()]
 
 def dist(ip1, ip2):
 	su=0
-	# print len(ip1)
-	# print len(ip2)
 	for i in range(len(ip1)):
-		su = abs(ip1[i]-ip2[i])
-	return su
+		su = (ip1[i]-ip2[i])**2
+	return math.sqrt(su)
 
 def buildtree(nod, point,level):
 	global leafnodes
 	if(level==maxlevel):
 		nod.leafnum=leafnodes
 		leafnodes+=1
+		# print "num leaf node %d"%leafnodes
+		# print "number of points in leaf %d"%(len(point))
 		return
 	[nx,ccenter]=cluster(point)
 	children=[]
 	for i in range(len(ccenter)):
-		# print len(ccenter[i])
 		children.append(node(ccenter[i]))
 		if(len(nx[i]) > numclusters):
 			buildtree(children[i],nx[i],level+1)
 		else:
 			children[i].leafnum=leafnodes
+			leafde[leafnodes]=len(nx[i])
 			leafnodes+=1
+			# print "num leaf node %d"%leafnodes
+			# print "number of points in leaf %d"%(len(nx[i]))
 	nod.chil(children)
 
 def invfile(filenum):
@@ -141,6 +131,7 @@ def invfile(filenum):
 					val=dist(ip,nod.child[i].center)
 			nod=nod.child[index]
 		leafno=nod.leafnum
+		leafre[leafno]+=1
 		invfilepoint[leafno].append(filenum)
 		if(leafno in Dleaf):
 			Dleaf[leafno] += 1
@@ -152,7 +143,7 @@ def invfilequery(image_points,X):
 	global leafnodes
 	leaf=[]
 	Qleaf = {}
-	[start, end] = image_points[filenum]
+	[start, end] = image_points[0]
 	for i in range(start,end):
 		nod=yn
 		ip=X[i]
@@ -179,12 +170,13 @@ yn = node([])
 buildtree(yn,y,0)
 for i in range(len(d_image_points)):
 	invfile(i)
-# for i in range(leafnodes):
-# 	print invfilepoint[i]
+for i in range(leafnodes):
+	print leafre[i]
+	print leafde[i]
+	# print invfilepoint[i]
 
 N = len(dfileList)
 for i in range(maxleafno):
-	# print 'hello'
 	dimages = leaders(invfilepoint[i])
 	Ni = len(dimages)+1
 	if Ni!=0:
