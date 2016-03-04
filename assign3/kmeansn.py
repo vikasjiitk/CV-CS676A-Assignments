@@ -133,8 +133,8 @@ def invfile(filenum):
 	for i in range(start,end):
 		nod=yn
 		ip=dX[i]
-		val=maxval
 		while(nod.leafnum==-1):
+			val=maxval
 			for i in range(len(nod.child)):
 				if(dist(ip,nod.child[i].center)< val):
 					index=i
@@ -155,9 +155,9 @@ def invfilequery(filenum,image_points,X):
 	[start, end] = image_points[filenum]
 	for i in range(start,end):
 		nod=yn
-		ip=dX[i]
-		val=maxval
+		ip=X[i]
 		while(nod.leafnum==-1):
+			val=maxval
 			for i in range(len(nod.child)):
 				if(dist(ip,nod.child[i].center)< val):
 					index=i
