@@ -148,7 +148,7 @@ def invfile(filenum):
 			Dleaf[leafno] = 1
 	dscore.append(Dleaf)
 
-def invfilequery(filenum,image_points,X):
+def invfilequery(image_points,X):
 	global leafnodes
 	leaf=[]
 	Qleaf = {}
@@ -205,7 +205,7 @@ for fil in qfileList:
 	arg.append(fil)
 	Score_Dict = {}
 	[qX,q_image_points] = sift_space(arg)
-	[qleafs,qdict] = invfilequery(0,q_image_points,qX)
+	[qleafs,qdict] = invfilequery(q_image_points,qX)
 	print qdict
 	qleafs = leaders(qleafs)
 	qnorm = 0
