@@ -10,7 +10,7 @@ from Queue import *
 numclusters = 4
 numpoints = 1000
 maxlevel = 5
-maxval = 10000000
+maxval = 1000000000
 maxleafno=(numclusters)**maxlevel
 source_dir = '../../data/assign3/dataset/'
 kres_dir = '../../data/assign3/adataset/'
@@ -30,9 +30,7 @@ leafre=[0 for i in range(maxleafno)]
 class node():
 	def __init__(self, cen):
 		self.center=cen
-		# print len(cen)
 		self.child=[]
-		# self.filenumList=[]
 		self.leafnum=-1
 	def chil(self,lis):
 		for x in lis:
@@ -137,6 +135,7 @@ buildtree(yn,y,0)
 for i in range(len(d_image_points)):
 	invfile(i)
 for i in range(leafnodes):
-	# print leafre[i]
-	# print leafde[i]
+	print "leaf number %d"%i
+	print leafre[i]
+	print leafde[i]
 	print invfilepoint[i]
