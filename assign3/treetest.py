@@ -24,13 +24,11 @@ qfileList = glob.glob(query_dir + '/*.jpg')
 node_entropy=[0 for i in range(maxleafno)]
 invfilepoint=[[] for i in range(maxleafno)]
 leafnodes=0
-leafde=[0 for i in range(maxleafno)]
-leafre=[0 for i in range(maxleafno)]
 
 class node():
-	def __init__(self, cen):
-		self.center=cen
+	def __init__(self):
 		self.child=[]
+		self.model=None
 		self.leafnum=-1
 	def chil(self,lis):
 		for x in lis:
@@ -75,30 +73,24 @@ def cluster(dat):
 	partition=[[] for i in range(numclusters)]
 	for i in range(len(dat)):
 		partition[y[i]].append(dat[i])
-	return [partition,kmean.cluster_centers_.tolist()]
-
-def dist(ip1, ip2):
-	su=0
-	for i in range(len(ip1)):
-		su = (ip1[i]-ip2[i])**2
-	return math.sqrt(su)
+	return [partition,kmean]
 
 def buildtree(nod, point,level):
 	global leafnodes
 	if(level==maxlevel):
 		nod.leafnum=leafnodes
-		leafnodes+=1	 # print "num leaf node %d"%leafnodes # print "number of points in leaf %d"%(len(point))
+		leafnodes+=1
 		return
-	[nx,ccenter]=cluster(point)
+	[nx,model]=cluster(point)
+	nod.model=model
 	children=[]
-	for i in range(len(ccenter)):
-		children.append(node(ccenter[i]))
+	for i in range(len(nx)):
+		children.append(node())
 		if(len(nx[i]) > numclusters):
 			buildtree(children[i],nx[i],level+1)
 		else:
 			children[i].leafnum=leafnodes
-			leafde[leafnodes]=len(nx[i])
-			leafnodes+=1	# print "num leaf node %d"%leafnodes # print "number of points in leaf %d"%(len(nx[i]))
+			leafnodes+=1
 	nod.chil(children)
 
 def invfile(filenum):
@@ -111,14 +103,9 @@ def invfile(filenum):
 		nod=yn
 		ip=dX[i]
 		while(nod.leafnum==-1):
-			val=maxval
-			for j in range(len(nod.child)):
-				if(dist(ip,nod.child[j].center)< val):
-					index=j
-					val=dist(ip,nod.child[j].center)
+			index=nod.model.predict(ip)
 			nod=nod.child[index]
 		leafno=nod.leafnum
-		leafre[leafno]+=1
 		invfilepoint[leafno].append(filenum)
 		if(leafno in Dleaf):
 			Dleaf[leafno] += 1
@@ -130,12 +117,9 @@ def invfile(filenum):
 [dX,d_image_points] = sift_space(dfileList)
 y=dX
 # print dX
-yn = node([])
+yn = node()
 buildtree(yn,y,0)
 for i in range(len(d_image_points)):
 	invfile(i)
 for i in range(leafnodes):
-	print "leaf number %d"%i
-	print leafre[i]
-	print leafde[i]
 	print invfilepoint[i]
