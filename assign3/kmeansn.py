@@ -8,7 +8,7 @@ from collections import defaultdict
 import numpy as np
 from Queue import *
 numclusters = 4
-numpoints = 0
+numpoints = 1000
 maxlevel = 5
 maxval = 10000000
 maxleafno=(numclusters)**maxlevel
@@ -24,6 +24,18 @@ qfileList = glob.glob(query_dir + '/*.jpg')
 node_entropy=[0 for i in range(maxleafno)]
 invfilepoint=[[] for i in range(maxleafno)]
 leafnodes=0
+
+class node():
+	def __init__(self, cen):
+		self.center=cen
+		# print len(cen)
+		self.child=[]
+		# self.filenumList=[]
+		self.leafnum=-1
+	def chil(self,lis):
+		for x in lis:
+			self.child.append(x)
+
 
 def leaders(xs):
     counts = defaultdict(int)
@@ -44,11 +56,11 @@ def sift_space(fileList):
 
 	no_im = 0
 	for fil in fileList:
-		print fil
+		# print fil
 		im = cv2.imread(fil);
 		gray= cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
 		(kps, descs) = sift.detectAndCompute(gray, None)
-		print len(kps)
+		# print len(kps)
 		no_sift = min(300, len(kps))
 		# print no_sift
 		image_points.append([i,i+no_sift])
@@ -63,6 +75,8 @@ def sift_space(fileList):
 	return [X[0:i],image_points]
 
 def cluster(dat):
+	# print len(dat)
+	# print len(dat[0])
 	if(numclusters>len(dat)):
 		return [[dat], [dat[0]]]
 	kmean=KMeans(init='k-means++', n_clusters=numclusters, n_init=10)
@@ -79,7 +93,7 @@ def cluster(dat):
 		for j in range(1,len(partition[i])):
 			temp+= partition[i][j]
 		# temp=temp-partition[i][0]
-		cluscenter.append([temp/len(partition[i]),len(partition[i])])
+		cluscenter.append(temp/len(partition[i]))
 		# cluscenter.append(['center',len(partition[i])])
 		# print len(partition[i])
 	return [partition,cluscenter]
@@ -92,127 +106,83 @@ def dist(ip1, ip2):
 		su = abs(ip1[i]-ip2[i])
 	return su
 
+def buildtree(nod, point,level):
+	global leafnodes
+	if(level==maxlevel):
+		nod.leafnum=leafnodes
+		leafnodes+=1
+		return
+	[nx,ccenter]=cluster(point)
+	children=[]
+	for i in range(len(ccenter)):
+		# print len(ccenter[i])
+		children.append(node(ccenter[i]))
+		if(len(nx[i]) > numclusters):
+			buildtree(children[i],nx[i],level+1)
+		else:
+			children[i].leafnum=leafnodes
+			leafnodes+=1
+	nod.chil(children)
+
 def invfile(filenum):
+	global leafnodes
 	[start, end] = d_image_points[filenum]
 	if start==end:
 		return
 	Dleaf={}
 	for i in range(start,end):
+		nod=yn
 		ip=dX[i]
-		cennum=0
-		for j in range(maxlevel):
-			count =0
-			val=maxval
-			for k in range(cennum,cennum+numclusters):
-				# print paramc[j][cennum][i][0]
-				if(dist(ip,paramc[j][k][0])< val):
-					index=k
-					valcount = count
-					val=dist(ip,paramc[j][k][0])
-				if(paramc[j][k][1] >= numclusters):
-					count += numclusters
-			if(paramc[j][index][1]<numclusters):
-				invfilepoint[paramc[j][index][2]].append(filenum) #changed
-                		leafno = paramc[j][index][2]
-                		if(leafno in Dleaf):
-                    			Dleaf[leafno] += 1
-                		else:
-                    			Dleaf[leafno] = 1
-                		break
-			if(j==maxlevel-1):
-				invfilepoint[paramc[j][index][2]].append(filenum)
-				leafno = paramc[j][index][2]
-				if(leafno in Dleaf):
-					Dleaf[leafno] += 1
-				else:
-					Dleaf[leafno] = 1
-			cennum = valcount
+		val=maxval
+		while(nod.leafnum==-1):
+			for i in range(len(nod.child)):
+				if(dist(ip,nod.child[i].center)< val):
+					index=i
+					val=dist(ip,nod.child[i].center)
+			nod=nod.child[index]
+		leafno=nod.leafnum
+		invfilepoint[leafno].append(filenum)
+		if(leafno in Dleaf):
+			Dleaf[leafno] += 1
+		else:
+			Dleaf[leafno] = 1
 	dscore.append(Dleaf)
 
 def invfilequery(filenum,image_points,X):
+	global leafnodes
 	leaf=[]
 	Qleaf = {}
 	[start, end] = image_points[filenum]
 	for i in range(start,end):
-		ip=X[i]
+		nod=yn
+		ip=dX[i]
 		val=maxval
-		cennum=0
-		for j in range(maxlevel):
-			count =0
-			val=maxval
-			for k in range(cennum,cennum+numclusters):
-				# print paramc[j][cennum][i][0]
-				if(dist(ip,paramc[j][k][0])< val):
-					index=k
-					valcount = count
-					val=dist(ip,paramc[j][k][0])
-				if(paramc[j][k][1] >= numclusters):
-					count += numclusters
-			if(paramc[j][index][1]<numclusters):
-				leaf.append(paramc[j][index][2])
-				leafno = paramc[j][index][2]
-				if(leafno in Qleaf):
-					Qleaf[leafno] += 1
-				else:
-					Qleaf[leafno] = 1
-				break
-			if(j==maxlevel-1):
-				leaf.append(paramc[j][index][2])
-				leafno = paramc[j][index][2]
-				if(leafno in Qleaf):
-					Qleaf[leafno] += 1
-				else:
-					Qleaf[leafno] = 1
-			cennum = valcount
+		while(nod.leafnum==-1):
+			for i in range(len(nod.child)):
+				if(dist(ip,nod.child[i].center)< val):
+					index=i
+					val=dist(ip,nod.child[i].center)
+			nod=nod.child[index]
+		leafno=nod.leafnum
+		leaf.append(leafno)
+		if(leafno in Qleaf):
+			Qleaf[leafno] += 1
+		else:
+			Qleaf[leafno] = 1
 	return [leaf,Qleaf]
 
-q= Queue()
 # X = np.array([(random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)) for i in range(numpoints)])
 [dX,d_image_points] = sift_space(dfileList)
 y=dX
-q.put(y)
-q.put(1)
-j=0
-centers=[]
-paramc=[]
-while not(q.empty()):
-	# print 'hi'
-	elem=q.get()
-	if type(elem) is int:
-		# print "new %d"%(j)
-		j+=1
-		q.put(j)
-		if(j== maxlevel):
-			for i in range(len(centers)):
-				centers[i].append(leafnodes)
-				leafnodes+=1
-			while not(q.empty()):
-				elem=q.get()
-			# 	if type(elem) is list:
-			# 		elem.append([])
-		paramc.append(centers)
-		# print "\nupdated paramc\n"
-		# print paramc
-		centers=[]
-	else:
-		[nX,ncenters] = cluster(elem)
-		# print j
-		for i in range(len(nX)):
-			x=nX[i]
-			if(len(x) > numclusters):
-				q.put(x)
-			elif j<maxlevel-1:
-				ncenters[i].append(leafnodes)
-				leafnodes+=1
-			centers.append(ncenters[i])
-		# print "centers"
-		# print ncenters
+# print dX
+yn = node([])
+buildtree(yn,y,0)
 for i in range(len(d_image_points)):
-	# print "invfile"
 	invfile(i)
+# for i in range(leafnodes):
+# 	print invfilepoint[i]
 
 N = len(dfileList)
-
 for i in range(maxleafno):
 	# print 'hello'
 	dimages = leaders(invfilepoint[i])
@@ -226,7 +196,7 @@ for i in range(len(dfileList)):
 	norm = 0
 	for j in Dict.keys():
 		norm += (Dict[j]*node_entropy[j])**2
-	dnorm[i] = math.sqrt(norm)
+	dnorm[i] = norm
 	print dnorm[i]
 
 for fil in qfileList:
@@ -241,7 +211,7 @@ for fil in qfileList:
 	qnorm = 0
 	for i in qdict.keys():
 		qnorm += (qdict[i]*node_entropy[i])**2
-	qnorm = math.sqrt(qnorm)
+
 	for i in qleafs:
 		leafnode = i[0]
 		#N = len(dfileList)
