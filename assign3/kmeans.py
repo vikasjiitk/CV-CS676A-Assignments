@@ -227,7 +227,7 @@ for i in range(len(dfileList)):
 	norm = 0
 	for j in Dict.keys():
 		norm += (Dict[j]*node_entropy[j])**2
-	dnorm[i] = norm
+	dnorm[i] = math.sqrt(norm)
 	print dnorm[i]
 
 for fil in qfileList:
@@ -242,7 +242,7 @@ for fil in qfileList:
 	qnorm = 0
 	for i in qdict.keys():
 		qnorm += (qdict[i]*node_entropy[i])**2
-
+	qnorm = math.sqrt(qnorm)
 	for i in qleafs:
 		leafnode = i[0]
 		#N = len(dfileList)
