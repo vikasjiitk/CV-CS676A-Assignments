@@ -2,14 +2,15 @@ import random
 import glob
 import cv2
 import math
+import sys
 from sklearn.cluster import KMeans
 from multiprocessing import Queue
 from collections import defaultdict
 import numpy as np
 from Queue import *
-numclusters = 4
+numclusters = int(sys.argv[2])
 numpoints = 1000
-maxlevel = 5
+maxlevel = int(sys.argv[1])
 maxval = 10000000
 maxleafno=(numclusters)**maxlevel
 source_dir = '../../data/assign3/dataset/'
@@ -63,10 +64,10 @@ def sift_space(fileList):
 		no_im += 1
 		X[i:i+no_siftn] = descs[0:no_siftn]
 		i += no_siftn
-		img = im
-		cv2.drawKeypoints(im,kps[0:no_siftn],img)
-		cv2.imwrite(kres_dir+fil[28:-4]+'2.jpg',img)
-	# print X[0:i]
+	# 	img = im
+	# 	cv2.drawKeypoints(im,kps[0:no_siftn],img)
+	# 	cv2.imwrite(kres_dir+fil[28:-4]+'2.jpg',img)
+	# # print X[0:i]
 	# print image_points
 	return [X[0:i],image_points]
 
@@ -159,12 +160,12 @@ for i in range(maxleafno):
 
 for i in range(len(dfileList)):
 	Dict = dscore[i]
-	print Dict
+	# print Dict
 	norm = 0
 	for j in Dict.keys():
 		norm += (Dict[j]*node_entropy[j])**2
 	dnorm[i] = math.sqrt(norm)
-	print dnorm[i]
+	# print dnorm[i]
 
 for fil in qfileList:
 	# print "I am here"
@@ -173,7 +174,7 @@ for fil in qfileList:
 	Score_Dict = {}
 	[qX,q_image_points] = sift_space(arg)
 	[qleafs,qdict] = invfilequery(q_image_points,qX)
-	print qdict
+	# print qdict
 	qleafs = leaders(qleafs)
 	qnorm = 0
 	for i in qdict.keys():
@@ -192,7 +193,7 @@ for fil in qfileList:
 				Score_Dict[j[0]] = qi*di
 	rscore = 0
 	for i in Score_Dict.keys():
-		print Score_Dict[i]
+		# print Score_Dict[i]
 		if(rscore < Score_Dict[i]):
 			rimage = i
 			rscore = Score_Dict[i]
@@ -202,7 +203,7 @@ for fil in qfileList:
 
 	h1, w1 = img1.shape[:2]
 	h2, w2 = img2.shape[:2]
-	print h1,h2,w1,w2
+	# print h1,h2,w1,w2
 	nWidth = w1+w2
 	nHeight = max(h1, h2)
 	hdif = abs(h1-h2)/2
@@ -210,4 +211,4 @@ for fil in qfileList:
 	newimg[hdif:hdif+h2, :w2] = img2
 	newimg[:h1, w2:w1+w2] = img1
 	# print "hi"
-	cv2.imwrite(res_dir+fil[26:-4]+'_result.jpg',newimg)
+	cv2.imwrite(res_dir+fil[26:-4]+'_'+str(maxlevel)+'_'+str(numclusters)+'_result.jpg',newimg)
