@@ -12,9 +12,9 @@ numpoints = 1000
 maxlevel = 5
 maxval = 10000000
 maxleafno=(numclusters)**maxlevel
-source_dir = '../../data/assign3/dataset/'
+source_dir = '../../data/assign3/sdataset/'
 kres_dir = '../../data/assign3/adataset/'
-query_dir= '../../data/assign3/query/'
+query_dir= '../../data/assign3/squery/'
 res_dir = '../../data/assign3/rquery/'
 dfileList = glob.glob(source_dir + '/*.jpg')
 dscore=[]
@@ -58,13 +58,13 @@ def sift_space(fileList):
 
 	no_im = 0
 	for fil in fileList:
-		# print fil
+		print fil
 		im = cv2.imread(fil);
 		gray= cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
 		(kps, descs) = sift.detectAndCompute(gray, None)
-		# print len(kps)
+		print len(kps)
 		no_sift = min(300, len(kps))
-		# print no_sift
+		print no_sift
 		image_points.append([i,i+no_sift])
 		no_im += 1
 		X[i:i+no_sift] = descs[0:no_sift]
@@ -188,7 +188,7 @@ for i in range(len(dfileList)):
 	norm = 0
 	for j in Dict.keys():
 		norm += (Dict[j]*node_entropy[j])**2
-	dnorm[i] = norm
+	dnorm[i] = math.sqrt(norm)
 	print dnorm[i]
 
 for fil in qfileList:
@@ -203,7 +203,7 @@ for fil in qfileList:
 	qnorm = 0
 	for i in qdict.keys():
 		qnorm += (qdict[i]*node_entropy[i])**2
-
+	qnorm  = math.sqrt(qnorm)
 	for i in qleafs:
 		leafnode = i[0]
 		#N = len(dfileList)
